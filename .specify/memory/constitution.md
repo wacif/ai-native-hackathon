@@ -1,55 +1,48 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+Version change: 0.0.0 -> 1.0.0 (MAJOR: Initial constitution for new project)
+List of modified principles: None (all new for this project)
+Added sections: None (template sections filled)
+Removed sections: None
+Templates requiring updates:
+- .specify/templates/plan-template.md ✅ updated
+- .specify/templates/spec-template.md ✅ updated
+- .specify/templates/tasks-template.md ✅ updated
+- .specify/templates/commands/*.md ✅ updated
+- README.md ✅ updated
+Follow-up TODOs: None
+-->
+# Physical AI & Humanoid Robotics Textbook Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. AI/Spec-Driven Development
+Prioritize AI-driven tools (Claude Code, Spec-Kit Plus) for all development stages (spec, plan, tasks, code generation). Adhere to Spec-Driven Development (SDD) principles to ensure clear requirements, detailed planning, and automated task generation.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Modular & Extensible Architecture
+Design the book project, including Docusaurus, RAG chatbot, and any additional features (Signup/Signin, Personalization, Translation), with a modular and extensible architecture. Components must be loosely coupled, independently deployable, and easily extendable for future enhancements.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Robust RAG Chatbot Integration
+Ensure the integrated RAG chatbot is robust, accurate, and provides a seamless user experience. It must leverage OpenAI Agents/ChatKit SDKs, FastAPI, Neon Serverless Postgres, and Qdrant Cloud. The chatbot must answer questions about the book content, including text selection.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. User-Centric Design & Personalization
+Implement user-centric design principles, including optional Signup/Signin with Better-Auth. Personalization and translation features (Urdu) should enhance the reader's learning experience, with clear mechanisms for user control.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Continuous Integration & Deployment
+Establish a continuous integration and deployment (CI/CD) pipeline for the Docusaurus book to GitHub Pages. Ensure automated testing, building, and deployment processes are in place for rapid iteration and reliable updates.
 
-### [PRINCIPLE_6_NAME]
+### VI. Hardware & Simulation Awareness
+Given the course's focus on Physical AI and Humanoid Robotics, ensure the textbook content accurately reflects the hardware requirements (RTX GPUs, Jetson kits, RealSense cameras) and simulation environments (Gazebo, Unity, NVIDIA Isaac Sim). Emphasize best practices for sim-to-real transfer and addressing latency concerns.
 
+## Technical Stack & Tools
 
-[PRINCIPLE__DESCRIPTION]
+The project will utilize Docusaurus for book generation and deployment to GitHub Pages. The RAG chatbot will be built with OpenAI Agents/ChatKit SDKs, FastAPI, Neon Serverless Postgres, and Qdrant Cloud. Better-Auth will be used for Signup/Signin. Development will be driven by Claude Code and Spec-Kit Plus.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Development Workflow & Quality Gates
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+Development will follow Spec-Driven Development (SDD) principles, utilizing Spec-Kit Plus artifacts (spec.md, plan.md, tasks.md). Prompt History Records (PHRs) will be created for every user interaction. Architectural Decision Records (ADRs) will be suggested for significant decisions. Code reviews, automated testing, and CI/CD will ensure quality.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This constitution serves as the foundational agreement for all development within the "Physical AI & Humanoid Robotics Textbook" project. All code contributions, architectural decisions, and feature implementations MUST adhere to these principles. Amendments to this constitution require a formal proposal, team review, and a version bump in accordance with semantic versioning rules. Compliance will be verified during code reviews and project milestones.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2025-11-28 | **Last Amended**: 2025-11-28
