@@ -24,15 +24,16 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Initialize Docusaurus project in `frontend/`
-- [ ] T002 Initialize FastAPI project in `backend/`
-- [ ] T003 Configure Docusaurus `docusaurus.config.ts` for textbook structure
-- [ ] T004 Configure FastAPI `backend/main.py` for basic server setup
-- [ ] T005 [P] Setup Git repository and initial commit (already exists, but for completeness)
-- [ ] T006 Install frontend dependencies (Docusaurus) in `frontend/package.json`
-- [ ] T007 Install backend dependencies (FastAPI, uvicorn, openai, qdrant-client, psycopg2-binary) in `backend/requirements.txt`
-- [ ] T008 [P] Configure basic linting and formatting for frontend (`.prettierrc`, `.eslintrc.js`)
-- [ ] T009 [P] Configure basic linting and formatting for backend (`pyproject.toml`, `.flake8`)
+- [X] T001 Initialize Docusaurus project in `frontend/`
+- [X] T002 Initialize FastAPI project in `backend/`
+- [X] T003 Configure Docusaurus `docusaurus.config.ts` for textbook structure
+- [X] T004 Configure FastAPI `backend/main.py` for basic server setup
+- [X] T005 [P] Setup Git repository and initial commit (already exists, but for completeness)
+- [X] T006 Install frontend dependencies (Docusaurus) in `frontend/package.json`
+- [X] T006.1 Create and activate virtual environment in `backend/`
+- [X] T007 Install backend dependencies (FastAPI, uvicorn, openai, qdrant-client, psycopg2-binary) in `backend/requirements.txt`
+- [X] T008 [P] Configure basic linting and formatting for frontend (`.prettierrc`, `.eslintrc.js`)
+- [X] T009 [P] Configure basic linting and formatting for backend (`pyproject.toml`, `.flake8`)
 
 ---
 
