@@ -18,3 +18,25 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Node.js/JavaScript/TypeScript
+/dist
+*.log
+coverage/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+/dist
+*.egg-info/
+
+# Universal
+*.tmp
+*.swp
+.vscode/
+.idea/
