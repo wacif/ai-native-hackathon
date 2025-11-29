@@ -1,3 +1,7 @@
+---
+sidebar_position: 2
+---
+
 # Chapter 1: Robot Sensors and Perception
 
 Understanding the environment is the first step for any intelligent robot. In this chapter, we explore the sensory systems that enable robots to perceive and interpret the physical world around them.

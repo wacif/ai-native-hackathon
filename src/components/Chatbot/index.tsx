@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import styles from './Chatbot.module.css';
 
 interface Message {
@@ -192,7 +194,39 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
                   className={`${styles.message} ${styles[message.type]}`}
                 >
                   <div className={styles.messageContent}>
-                    {message.content}
+                    {message.type === 'bot' ? (
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          // Customize markdown rendering for chatbot
+                          p: ({ children }) => <p style={{ margin: '0.5em 0' }}>{children}</p>,
+                          ul: ({ children }) => <ul style={{ margin: '0.5em 0', paddingLeft: '1.5em' }}>{children}</ul>,
+                          ol: ({ children }) => <ol style={{ margin: '0.5em 0', paddingLeft: '1.5em' }}>{children}</ol>,
+                          code: ({ inline, children }) => 
+                            inline ? (
+                              <code style={{ 
+                                background: 'var(--ifm-code-background)', 
+                                padding: '0.1em 0.3em',
+                                borderRadius: '3px',
+                                fontSize: '0.9em'
+                              }}>{children}</code>
+                            ) : (
+                              <code style={{ 
+                                display: 'block',
+                                background: 'var(--ifm-code-background)',
+                                padding: '0.5em',
+                                borderRadius: '4px',
+                                fontSize: '0.9em',
+                                overflowX: 'auto'
+                              }}>{children}</code>
+                            )
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    ) : (
+                      message.content
+                    )}
                   </div>
                   {message.sources && message.sources.length > 0 && (
                     <div className={styles.sources}>

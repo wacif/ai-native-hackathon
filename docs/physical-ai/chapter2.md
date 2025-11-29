@@ -1,3 +1,7 @@
+---
+sidebar_position: 3
+---
+
 # Chapter 2: Actuators and Movement Control
 
 After perceiving the environment, robots must be able to act. This chapter explores the actuators that enable physical movement and the control systems that coordinate them.

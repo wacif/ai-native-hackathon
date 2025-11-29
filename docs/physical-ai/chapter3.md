@@ -1,3 +1,7 @@
+---
+sidebar_position: 4
+---
+
 # Chapter 3: AI Algorithms for Robotics
 
 Artificial Intelligence provides the "brain" that transforms sensor data into intelligent decisions and coordinated actions. This chapter explores the fundamental AI algorithms that enable robots to navigate, plan, and interact with the world.

@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+---
+
 # Introduction to Physical AI & Humanoid Robotics
 
 Welcome to the fascinating world of Physical AI and Humanoid Robotics! This textbook will guide you through the fundamental concepts, technologies, and applications that are shaping the future of intelligent physical systems.
