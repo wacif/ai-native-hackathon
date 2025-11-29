@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'My Site',
+  title: 'Physical AI & Humanoid Robotics',
   tagline: 'CoLearning Embodied Intelligence with ROS 2 and NVIDIA Isaac – The AI & Spec Driven Way',
   favicon: 'img/favicon.ico',
 
@@ -83,7 +83,7 @@ const config: Config = {
       items: [
         {
           type: 'docSidebar',
-          sidebarId: 'docsSidebar',
+          sidebarId: 'tutorialSidebar',
           position: 'left',
           label: 'Tutorial',
         },

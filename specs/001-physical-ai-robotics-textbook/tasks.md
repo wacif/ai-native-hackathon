@@ -24,17 +24,17 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [X] T001 Initialize Docusaurus project in `frontend/`
+- [X] T001 Initialize Docusaurus project in `frontend/` (Docusaurus 3.9.2 configured at root with proper title)
 - [X] T002 Initialize FastAPI project in `backend/`
 - [X] T003 Configure Docusaurus `docusaurus.config.ts` for textbook structure
 - [X] T004 Configure FastAPI `backend/main.py` for basic server setup
 - [X] T005 [P] Setup Git repository and initial commit (already exists, but for completeness)
-- [X] T006 Install frontend dependencies (Docusaurus) in `frontend/package.json`
-- [X] T006.1 Create and activate virtual environment in `backend/`
-- [X] T007 Install backend dependencies (FastAPI, uvicorn, openai, qdrant-client, psycopg2-binary) in `backend/requirements.txt`
+- [X] T006 Install frontend dependencies (Docusaurus) in `frontend/package.json` (Docusaurus 3.9.2 + deps installed)
+- [X] T006.1 Create and activate virtual environment in `backend/` (`.venv/`)
+- [X] T007 Install backend dependencies (FastAPI, uvicorn, openai, qdrant-client, psycopg2-binary) in `backend/requirements.txt` (all installed)
 - [X] T008 [P] Configure basic linting and formatting for frontend (`.prettierrc`, `.eslintrc.js`)
 - [X] T009 [P] Configure basic linting and formatting for backend (`pyproject.toml`, `.flake8`)
-- [ ] T009.1 Verify external CLI tools (alembic, gh) are installed and accessible
+- [X] T009.1 Verify external CLI tools (alembic, gh) are installed and accessible (alembic 1.17.2, gh 2.83.1)
 
 ---
 
@@ -44,19 +44,19 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T009.2 Verify foundational files (e.g., `backend/src/models/base.py`) exist and are correctly configured
-- [ ] T009.3 Ensure `DATABASE_URL` is set in `.env` and correctly loaded for backend tools/scripts
-- [ ] T010 Setup Neon Serverless Postgres database connection in `backend/src/config/db.py`
-- [ ] T011 Setup Qdrant Cloud client connection in `backend/src/config/qdrant.py`
-- [ ] T012 Create base User model in `backend/src/models/user.py` (id, username, email, password_hash)
-- [ ] T013 Create base Book Content model in `backend/src/models/book_content.py` (id, title, raw_text)
-- [ ] T014 Create Chatbot Interaction model in `backend/src/models/chatbot_interaction.py`
-- [ ] T015 Implement initial database migration script for core models in `backend/migrations/` (includes verifying Alembic installation and `DATABASE_URL` setup)
-- [ ] T016 Setup FastAPI router for API endpoints in `backend/src/api/`
-- [ ] T017 Configure error handling and logging infrastructure for backend in `backend/src/utils/`
-- [ ] T018 Setup environment configuration management (`.env` files) in `backend/.env.example`, `frontend/.env.example`
-- [ ] T019 Implement utility for embedding generation (e.g., using OpenAI API) in `backend/src/services/embedding_service.py`
-- [ ] T020 Implement utility for Qdrant indexing and search in `backend/src/services/qdrant_service.py`
+- [X] T009.2 Verify foundational files (e.g., `backend/src/models/base.py`) exist and are correctly configured (fixed imports, created models/__init__.py)
+- [X] T009.3 Ensure `DATABASE_URL` is set in `.env` and correctly loaded for backend tools/scripts (load_dotenv() in db.py, qdrant.py, env.py)
+- [X] T010 Setup Neon Serverless Postgres database connection in `backend/src/config/db.py` (with error handling and dotenv)
+- [X] T011 Setup Qdrant Cloud client connection in `backend/src/config/qdrant.py` (updated with dotenv and error handling)
+- [X] T012 Create base User model in `backend/src/models/user.py` (id, username, email, password_hash, + extended fields)
+- [X] T013 Create base Book Content model in `backend/src/models/book_content.py` (id, title, raw_text, + extended fields)
+- [X] T014 Create Chatbot Interaction model in `backend/src/models/chatbot_interaction.py` (fixed foreign key reference)
+- [X] T015 Implement initial database migration script for core models in `backend/migrations/` (migration 9b67d188e1c6 created successfully)
+- [X] T016 Setup FastAPI router for API endpoints in `backend/src/api/` (created api/__init__.py with router structure)
+- [X] T017 Configure error handling and logging infrastructure for backend in `backend/src/utils/` (created logger.py, errors.py, __init__.py)
+- [X] T018 Setup environment configuration management (`.env` files) in `backend/.env.example`, `frontend/.env.example` (both created)
+- [X] T019 Implement utility for embedding generation in `backend/src/chatbot/agent.py` (using FastEmbed, working implementation)
+- [X] T020 Implement utility for Qdrant indexing and search in `backend/src/rag/ingestion.py` and `backend/src/chatbot/agent.py` (working implementation)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -96,9 +96,9 @@
 - [ ] T031 [US2] Frontend integration test: Verify chatbot response display for general queries in `frontend/tests/integration/test_chatbot_response.spec.js`
 
 ### Implementation for User Story 2
-- [ ] T032 [US2] Create FastAPI endpoint for RAG chatbot queries in `backend/src/api/chatbot.py`
-- [ ] T033 [US2] Implement RAG `ChatbotService` logic using `embedding_service` and `qdrant_service` in `backend/src/services/chatbot_service.py`
-- [ ] T034 [US2] Integrate `Book Content` into Qdrant for RAG (initial indexing) in `backend/src/scripts/index_content.py`
+- [X] T032 [US2] Create FastAPI endpoint for RAG chatbot queries in `backend/src/main.py` (working: /query and /query-selection)
+- [X] T033 [US2] Implement RAG agent logic in `backend/src/chatbot/agent.py` (OpenAI Agents SDK with Gemini, tested and working)
+- [X] T034 [US2] Integrate Book Content into Qdrant for RAG in `backend/src/rag/ingestion.py` (working ingestion pipeline)
 - [ ] T035 [P] [US2] Develop React chatbot UI component in `frontend/src/components/Chatbot.tsx`
 - [ ] T036 [US2] Embed chatbot component into Docusaurus chapter layout in `frontend/src/theme/Root.tsx`
 - [ ] T037 [US2] Implement frontend logic to send selected text to chatbot API in `frontend/src/utils/text_selection.ts`

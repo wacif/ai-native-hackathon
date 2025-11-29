@@ -1,8 +1,8 @@
 import uuid
-from sqlalchemy import Column, String, DateTime, func, JSONB
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, DateTime, func
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 
-from backend.src.models.base import Base
+from .base import Base
 
 class User(Base):
     __tablename__ = "users"
