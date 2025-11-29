@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import styles from './Chatbot.module.css';
 
 interface Message {
@@ -60,7 +62,7 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
     };
   }, []);
 
-  const sendMessage = async (messageText: string, useSelection: boolean = false) => {
+  const sendMessage = async (messageText: string) => {
     if (!messageText.trim()) return;
 
     const userMessage: Message = {
@@ -75,8 +77,9 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
     setIsLoading(true);
 
     try {
-      const endpoint = useSelection && selectedText ? '/query-selection' : '/query';
-      const requestBody = useSelection && selectedText
+      // Determine which endpoint to use based on whether we have selected text
+      const endpoint = selectedText ? '/query-selection' : '/query';
+      const requestBody = selectedText
         ? {
             question: messageText,
             selected_text: selectedText,
@@ -114,7 +117,7 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
       setMessages(prev => [...prev, botMessage]);
       
       // Clear selected text after use
-      if (useSelection) {
+      if (selectedText) {
         setSelectedText('');
       }
     } catch (error) {
@@ -133,13 +136,7 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    sendMessage(input, false);
-  };
-
-  const handleAskAboutSelection = () => {
-    if (selectedText && input.trim()) {
-      sendMessage(input, true);
-    }
+    sendMessage(input);
   };
 
   return (
@@ -197,7 +194,39 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
                   className={`${styles.message} ${styles[message.type]}`}
                 >
                   <div className={styles.messageContent}>
-                    {message.content}
+                    {message.type === 'bot' ? (
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          // Customize markdown rendering for chatbot
+                          p: ({ children }) => <p style={{ margin: '0.5em 0' }}>{children}</p>,
+                          ul: ({ children }) => <ul style={{ margin: '0.5em 0', paddingLeft: '1.5em' }}>{children}</ul>,
+                          ol: ({ children }) => <ol style={{ margin: '0.5em 0', paddingLeft: '1.5em' }}>{children}</ol>,
+                          code: ({ node, inline, className, children, ...props }: any) => 
+                            inline ? (
+                              <code style={{ 
+                                background: 'var(--ifm-code-background)', 
+                                padding: '0.1em 0.3em',
+                                borderRadius: '3px',
+                                fontSize: '0.9em'
+                              }} {...props}>{children}</code>
+                            ) : (
+                              <code style={{ 
+                                display: 'block',
+                                background: 'var(--ifm-code-background)',
+                                padding: '0.5em',
+                                borderRadius: '4px',
+                                fontSize: '0.9em',
+                                overflowX: 'auto'
+                              }} {...props}>{children}</code>
+                            )
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    ) : (
+                      message.content
+                    )}
                   </div>
                   {message.sources && message.sources.length > 0 && (
                     <div className={styles.sources}>
@@ -229,17 +258,6 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
               className={styles.input}
               disabled={isLoading}
             />
-            {selectedText ? (
-              <button
-                type="button"
-                onClick={handleAskAboutSelection}
-                className={`${styles.sendButton} ${styles.selectionButton}`}
-                disabled={isLoading || !input.trim()}
-                title="Ask about selected text"
-              >
-                📝
-              </button>
-            ) : null}
             <button
               type="submit"
               className={styles.sendButton}

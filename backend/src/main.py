@@ -109,7 +109,10 @@ async def query_book(request: QueryRequest):
     try:
         # Use the agent to answer the question
         # The agent will automatically use the search_book_content tool
-        result = await query_agent(request.question)
+        result = await query_agent(
+            request.question, 
+            chapter_id=request.chapter_id
+        )
 
         if not result["success"]:
             raise HTTPException(
@@ -151,7 +154,8 @@ async def query_selected_text(request: TextSelectionRequest):
         # Use the agent with the selected text as context
         result = await query_agent(
             question=request.question,
-            context=request.selected_text
+            context=request.selected_text,
+            chapter_id=request.chapter_id
         )
 
         if not result["success"]:

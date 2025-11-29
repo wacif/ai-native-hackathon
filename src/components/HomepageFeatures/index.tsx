@@ -11,32 +11,32 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
+    title: 'AI-Powered Learning',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Interactive chatbot assistant powered by RAG (Retrieval Augmented Generation) 
+        helps you understand complex concepts by answering questions in real-time.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: 'Comprehensive Content',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        From sensors and actuators to AI algorithms and control systems - 
+        everything you need to understand Physical AI and Humanoid Robotics.
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: 'Context-Aware Assistant',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Select any text to ask specific questions. The chatbot knows which chapter 
+        you're reading and provides relevant, focused answers.
       </>
     ),
   },
