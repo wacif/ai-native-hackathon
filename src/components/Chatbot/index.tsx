@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './Chatbot.module.css';
 
 interface Message {
@@ -20,13 +21,16 @@ interface ChatbotProps {
 }
 
 export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
+  const { siteConfig } = useDocusaurusContext();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedText, setSelectedText] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+  
+  // Get API URL from customFields or use localhost for development
+  const API_URL = (siteConfig.customFields?.apiUrl as string) || 'http://localhost:8000';
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {

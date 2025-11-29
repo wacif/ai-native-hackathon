@@ -9,6 +9,12 @@ const config: Config = {
   tagline: 'CoLearning Embodied Intelligence with ROS 2 and NVIDIA Isaac – The AI & Spec Driven Way',
   favicon: 'img/favicon.ico',
 
+  // Custom fields for runtime configuration
+  customFields: {
+    // Backend API URL - use environment variable or default to localhost
+    apiUrl: process.env.API_URL || 'http://localhost:8000',
+  },
+
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
     v4: true, // Improve compatibility with the upcoming Docusaurus v4
