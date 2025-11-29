@@ -1,9 +1,9 @@
 import uuid
-from sqlalchemy import Column, String, Text, DateTime, Integer, func, JSONB, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, Text, DateTime, Integer, func, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 
-from backend.src.models.base import Base
+from .base import Base
 
 class BookContent(Base):
     __tablename__ = "book_content"
@@ -13,7 +13,8 @@ class BookContent(Base):
     raw_text = Column(Text, nullable=False)
     personalized_text = Column(JSONB, nullable=True)
     urdu_text = Column(Text, nullable=True)
-    module_id = Column(UUID(as_uuid=True), ForeignKey("modules.id"), nullable=True) # Assuming a Module entity
+    # Removed module_id foreign key - modules table doesn't exist yet
+    # module_id = Column(UUID(as_uuid=True), ForeignKey("modules.id"), nullable=True)
     order = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=func.now(), nullable=False)
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)

@@ -25,7 +25,12 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from src.models.base import Base # Assuming Base is defined here
+from src.models.base import Base
+# Import all models so Alembic can detect them
+from src.models.user import User
+from src.models.book_content import BookContent
+from src.models.chatbot_interaction import ChatbotInteraction
+
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
