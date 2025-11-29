@@ -11,10 +11,16 @@ class BookContent(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String, nullable=False)
     raw_text = Column(Text, nullable=False)
+    
+    # Chapter and module identification
+    chapter_id = Column(String, nullable=True, index=True)  # e.g., "chapter1", "intro"
+    module_id = Column(String, nullable=True, index=True)   # e.g., "module1", "physical-ai"
+    page_url = Column(String, nullable=True, index=True)    # e.g., "/docs/physical-ai/chapter1"
+    
+    # Content variations
     personalized_text = Column(JSONB, nullable=True)
     urdu_text = Column(Text, nullable=True)
-    # Removed module_id foreign key - modules table doesn't exist yet
-    # module_id = Column(UUID(as_uuid=True), ForeignKey("modules.id"), nullable=True)
+    
     order = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=func.now(), nullable=False)
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
