@@ -1,15 +1,10 @@
 <!--
 Sync Impact Report:
-Version change: 1.0.0 -> 1.1.0 (MINOR: Added new principles for AI-native educational content and agent context management)
-List of modified principles: All core principles refined and expanded
-Added sections:
-- Constitutional Persona
-- Your Core Capabilities
-- Before Creating Any Content, Analyze
-- Core Principles for All Reasoning
-- Preamble: What This Book Is
-- I. The Paradigm Shift: From Reusable Code to Reusable Intelligence
-- II. Agent Context Requirements (Intelligence Accumulation)
+Version change: 1.1.0 -> 1.2.0 (MINOR: Added guidelines for Context7 tool and virtual environment activation)
+List of modified principles:
+- II. Agent Context Requirements (Intelligence Accumulation): Research Depth Decision
+- Development Workflow & Quality Gates: Added Virtual Environment Activation
+Added sections: None
 Removed sections: None
 Templates requiring updates:
 - .specify/templates/plan-template.md ✅ updated
@@ -154,7 +149,7 @@ When starting chapter work, ask:
 
 -   Is this a market-defining chapter requiring comprehensive research?
 -   Or incremental chapter building on established patterns?
--   What authoritative sources exist (Context7 libraries, official docs)?
+-   What authoritative sources exist (Claude Code's `claude-code-guide` agent for documentation, Context7 libraries, official docs)?
 
 **Reusable Intelligence Harvest**
 
@@ -201,7 +196,15 @@ The project will utilize Docusaurus for book generation and deployment to GitHub
 
 Development will follow Spec-Driven Development (SDD) principles, utilizing Spec-Kit Plus artifacts (spec.md, plan.md, tasks.md). Prompt History Records (PHRs) will be created for every user interaction. Architectural Decision Records (ADRs) will be suggested for significant decisions. Code reviews, automated testing, and CI/CD will ensure quality.
 
+### Virtual Environment Activation
+
+All Python-based development MUST be performed within an activated virtual environment to ensure dependency isolation and reproducibility.
+
+### Robust Environment Setup & Tooling
+
+All critical environment variables MUST be managed via .env files and explicitly loaded (e.g., using `dotenv.load_dotenv()` in Python scripts). Values from these files MUST be accessed directly via `os.environ` within code/scripts, rather than relying on configuration file parsers for environment variable expansion. Python module imports in build/tooling scripts (e.g., Alembic migrations) MUST ensure PYTHONPATH or sys.path is correctly configured to resolve internal project modules. External CLI tools (e.g., alembic, gh) MUST be verified for installation and accessibility before execution. Additionally, foundational project files (e.g., ORM base models, core configuration files) MUST be explicitly defined and their existence verified before any dependent operations, with clear guidelines for their expected location and content.
+
 ## Governance
 This constitution serves as the foundational agreement for all development within the "Physical AI & Humanoid Robotics Textbook" project. All code contributions, architectural decisions, and feature implementations MUST adhere to these principles. Amendments to this constitution require a formal proposal, team review, and a version bump in accordance with semantic versioning rules. Compliance will be verified during code reviews and project milestones.
 
-**Version**: 1.1.0 | **Ratified**: 2025-11-28 | **Last Amended**: 2025-11-28
+**Version**: 1.2.3 | **Ratified**: 2025-11-28 | **Last Amended**: 2025-11-29

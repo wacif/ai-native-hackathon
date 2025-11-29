@@ -34,6 +34,7 @@
 - [X] T007 Install backend dependencies (FastAPI, uvicorn, openai, qdrant-client, psycopg2-binary) in `backend/requirements.txt`
 - [X] T008 [P] Configure basic linting and formatting for frontend (`.prettierrc`, `.eslintrc.js`)
 - [X] T009 [P] Configure basic linting and formatting for backend (`pyproject.toml`, `.flake8`)
+- [ ] T009.1 Verify external CLI tools (alembic, gh) are installed and accessible
 
 ---
 
@@ -43,12 +44,14 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
+- [ ] T009.2 Verify foundational files (e.g., `backend/src/models/base.py`) exist and are correctly configured
+- [ ] T009.3 Ensure `DATABASE_URL` is set in `.env` and correctly loaded for backend tools/scripts
 - [ ] T010 Setup Neon Serverless Postgres database connection in `backend/src/config/db.py`
 - [ ] T011 Setup Qdrant Cloud client connection in `backend/src/config/qdrant.py`
 - [ ] T012 Create base User model in `backend/src/models/user.py` (id, username, email, password_hash)
 - [ ] T013 Create base Book Content model in `backend/src/models/book_content.py` (id, title, raw_text)
 - [ ] T014 Create Chatbot Interaction model in `backend/src/models/chatbot_interaction.py`
-- [ ] T015 Implement initial database migration script for core models in `backend/migrations/`
+- [ ] T015 Implement initial database migration script for core models in `backend/migrations/` (includes verifying Alembic installation and `DATABASE_URL` setup)
 - [ ] T016 Setup FastAPI router for API endpoints in `backend/src/api/`
 - [ ] T017 Configure error handling and logging infrastructure for backend in `backend/src/utils/`
 - [ ] T018 Setup environment configuration management (`.env` files) in `backend/.env.example`, `frontend/.env.example`

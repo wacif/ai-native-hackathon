@@ -113,7 +113,19 @@ ios/ or android/
 **Structure Decision**: [Document the selected structure and reference the real
 directories captured above]
 
-## Complexity Tracking
+## Project Setup Verification
+
+### Environment and Tooling Prerequisites
+
+Explicit checks for `alembic` and `gh` CLI tools MUST be performed before any migration or PR creation tasks. `.env` files MUST be used to manage `DATABASE_URL` and other sensitive environment variables, ensuring they are loaded correctly by the application and tooling (e.g., in `env.py` for Alembic).
+
+### Foundational File & Module Verification
+
+Before critical operations (e.g., database migrations, API startup), all foundational project files (e.g., ORM base models like `backend/src/models/base.py`, core configuration files) MUST be explicitly defined and their existence verified. Ensure that Python module import paths (e.g., `sys.path`) are correctly configured to allow resolution of internal project modules across different execution contexts (e.g., when running scripts from the project root versus within `backend/`).
+
+### Environment Variable Propagation for Tools
+
+Environment variables, particularly sensitive ones like `DATABASE_URL`, MUST be explicitly loaded within relevant scripts (e.g., `backend/migrations/env.py` using `dotenv.load_dotenv()`) and accessed directly via `os.environ`. Tools and frameworks (e.g., Alembic) should NOT rely on their configuration files for environment variable expansion, but rather on the script's explicit handling of `os.environ` after `.env` loading. This ensures consistent and secure access to configuration across different execution environments.
 
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
