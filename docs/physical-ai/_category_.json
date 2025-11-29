@@ -1,0 +1,9 @@
+{
+  "label": "Physical AI & Robotics",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Learn about Physical AI and Humanoid Robotics - from sensors and actuators to AI algorithms and control systems."
+  }
+}
+

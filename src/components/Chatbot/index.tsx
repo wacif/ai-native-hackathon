@@ -60,7 +60,7 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
     };
   }, []);
 
-  const sendMessage = async (messageText: string, useSelection: boolean = false) => {
+  const sendMessage = async (messageText: string) => {
     if (!messageText.trim()) return;
 
     const userMessage: Message = {
@@ -75,8 +75,9 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
     setIsLoading(true);
 
     try {
-      const endpoint = useSelection && selectedText ? '/query-selection' : '/query';
-      const requestBody = useSelection && selectedText
+      // Determine which endpoint to use based on whether we have selected text
+      const endpoint = selectedText ? '/query-selection' : '/query';
+      const requestBody = selectedText
         ? {
             question: messageText,
             selected_text: selectedText,
@@ -114,7 +115,7 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
       setMessages(prev => [...prev, botMessage]);
       
       // Clear selected text after use
-      if (useSelection) {
+      if (selectedText) {
         setSelectedText('');
       }
     } catch (error) {
@@ -133,13 +134,7 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    sendMessage(input, false);
-  };
-
-  const handleAskAboutSelection = () => {
-    if (selectedText && input.trim()) {
-      sendMessage(input, true);
-    }
+    sendMessage(input);
   };
 
   return (
@@ -229,17 +224,6 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
               className={styles.input}
               disabled={isLoading}
             />
-            {selectedText ? (
-              <button
-                type="button"
-                onClick={handleAskAboutSelection}
-                className={`${styles.sendButton} ${styles.selectionButton}`}
-                disabled={isLoading || !input.trim()}
-                title="Ask about selected text"
-              >
-                📝
-              </button>
-            ) : null}
             <button
               type="submit"
               className={styles.sendButton}
