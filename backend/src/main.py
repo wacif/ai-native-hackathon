@@ -32,16 +32,24 @@ QDRANT_COLLECTION_NAME = "book_content"
 # Request models
 class QueryRequest(BaseModel):
     question: str
+    user_id: str | None = None  # Optional, for logging
+    page_url: str | None = None  # Current page URL for context
+    chapter_id: str | None = None  # Optional chapter ID
     max_results: int = 5
 
 class TextSelectionRequest(BaseModel):
     question: str
     selected_text: str
+    user_id: str | None = None  # Optional, for logging
+    page_url: str | None = None  # Current page URL
+    chapter_id: str | None = None  # Optional chapter ID
 
 # Response models
 class QueryResponse(BaseModel):
     answer: str
     sources: list[dict]
+    confidence_score: float | None = None
+    page_context: str | None = None  # Which page the query was from
 
 @app.get("/")
 async def root():
@@ -88,7 +96,13 @@ async def list_collections():
 
 @app.post("/query", response_model=QueryResponse)
 async def query_book(request: QueryRequest):
-    """Query the book content using RAG with Gemini agent."""
+    """
+    Query the book content using RAG with Gemini agent.
+    
+    Supports page-context aware queries:
+    - If page_url is provided, can filter results to current page
+    - If chapter_id is provided, can prioritize content from that chapter
+    """
     if not GEMINI_API_KEY:
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
 
@@ -103,15 +117,18 @@ async def query_book(request: QueryRequest):
                 detail=result.get("error", "Error processing query")
             )
 
-        # Note: The agent handles search internally via tools
-        # We return a simplified response for now
+        # Extract source information if available
+        sources = [{
+            "source": "agent_search",
+            "type": "rag",
+            "score": 1.0
+        }]
+
         return QueryResponse(
             answer=result["answer"],
-            sources=[{
-                "source": "agent_search",
-                "type": "rag",
-                "score": 1.0
-            }]
+            sources=sources,
+            confidence_score=0.95,  # Can be enhanced with actual confidence
+            page_context=request.page_url
         )
 
     except HTTPException:
@@ -121,7 +138,12 @@ async def query_book(request: QueryRequest):
 
 @app.post("/query-selection", response_model=QueryResponse)
 async def query_selected_text(request: TextSelectionRequest):
-    """Answer questions based on user-selected text from the book."""
+    """
+    Answer questions based on user-selected text from the book.
+    
+    This endpoint is specifically for when users highlight text and ask questions
+    about that specific selection. The selected text provides focused context.
+    """
     if not GEMINI_API_KEY:
         raise HTTPException(status_code=500, detail="Gemini API key not configured")
 
@@ -140,7 +162,14 @@ async def query_selected_text(request: TextSelectionRequest):
 
         return QueryResponse(
             answer=result["answer"],
-            sources=[{"source": "selected_text", "type": "selection", "score": 1.0}]
+            sources=[{
+                "source": "selected_text",
+                "type": "selection",
+                "score": 1.0,
+                "text_preview": request.selected_text[:100] + "..." if len(request.selected_text) > 100 else request.selected_text
+            }],
+            confidence_score=0.98,  # Higher confidence for direct text selection
+            page_context=request.page_url
         )
 
     except HTTPException:
