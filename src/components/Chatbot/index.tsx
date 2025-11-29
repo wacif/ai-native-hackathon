@@ -202,14 +202,14 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
                           p: ({ children }) => <p style={{ margin: '0.5em 0' }}>{children}</p>,
                           ul: ({ children }) => <ul style={{ margin: '0.5em 0', paddingLeft: '1.5em' }}>{children}</ul>,
                           ol: ({ children }) => <ol style={{ margin: '0.5em 0', paddingLeft: '1.5em' }}>{children}</ol>,
-                          code: ({ inline, children }) => 
+                          code: ({ node, inline, className, children, ...props }: any) => 
                             inline ? (
                               <code style={{ 
                                 background: 'var(--ifm-code-background)', 
                                 padding: '0.1em 0.3em',
                                 borderRadius: '3px',
                                 fontSize: '0.9em'
-                              }}>{children}</code>
+                              }} {...props}>{children}</code>
                             ) : (
                               <code style={{ 
                                 display: 'block',
@@ -218,7 +218,7 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
                                 borderRadius: '4px',
                                 fontSize: '0.9em',
                                 overflowX: 'auto'
-                              }}>{children}</code>
+                              }} {...props}>{children}</code>
                             )
                         }}
                       >

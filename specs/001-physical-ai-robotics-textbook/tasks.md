@@ -134,6 +134,24 @@
 
 ---
 
+### Content & Polish for User Story 2
+- [X] T038.1 [US2] Create Physical AI textbook chapters (intro, chapter1, chapter2, chapter3) in `docs/physical-ai/`
+- [X] T038.2 [US2] Add chapter_id, module_id, page_url fields to BookContent model in `backend/src/models/book_content.py`
+- [X] T038.3 [US2] Create database migration for chapter metadata fields
+- [X] T038.4 [US2] Update ingestion pipeline to extract and store chapter metadata in `backend/src/rag/ingestion.py`
+- [X] T038.5 [US2] Create Qdrant payload indexes for chapter_id and module_id filtering
+- [X] T038.6 [US2] Update RAG agent to support chapter-aware filtering in `backend/src/chatbot/agent.py`
+- [X] T038.7 [US2] Enhance agent instructions to answer location queries ("what chapter am I on?")
+- [X] T038.8 [US2] Simplify text selection UX (single send button for both general and selection queries)
+- [X] T038.9 [US2] Add markdown rendering to chatbot UI using react-markdown in `src/components/Chatbot/index.tsx`
+- [X] T038.10 [US2] Remove default Docusaurus tutorial content from docs and blog
+- [X] T038.11 [US2] Update homepage features to reflect Physical AI content in `src/pages/index.tsx`
+- [X] T038.12 [US2] Add sidebar_position frontmatter to chapters for correct ordering
+
+**Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
+
+---
+
 ## ✅ **Phase 4 Completion Status**
 
 **Date**: 2025-11-29  
@@ -148,19 +166,29 @@
 - ✅ Dark mode support
 - ✅ Responsive design (mobile + desktop)
 - ✅ Integrated into Docusaurus via Root.tsx
+- ✅ 4 comprehensive Physical AI chapters created
+- ✅ Chapter-aware RAG filtering with Qdrant indexes
+- ✅ Chatbot knows current chapter and can answer location queries
+- ✅ Markdown rendering in chatbot responses
+- ✅ Clean content (removed default Docusaurus tutorials)
+- ✅ Proper sidebar ordering with frontmatter
 
 ### Features Implemented:
 1. **General Questions**: Ask about any book content via RAG
-2. **Text Selection**: Highlight text → Ask specific questions
-3. **Page-Aware**: Chatbot knows which page user is on
-4. **Source Attribution**: Shows where answers come from
-5. **Beautiful UI**: Gradient design, smooth animations, professional look
+2. **Text Selection**: Highlight text → Ask specific questions (simplified UX)
+3. **Page-Aware**: Chatbot knows which page user is on and filters by chapter
+4. **Location Aware**: Can answer "what chapter am I on?" type questions
+5. **Source Attribution**: Shows where answers come from with chapter info
+6. **Beautiful UI**: Gradient design, smooth animations, professional look
+7. **Markdown Rendering**: Bot responses render markdown properly (bold, lists, code, etc.)
+8. **Clean Navigation**: Proper chapter ordering in sidebar
 
 ### Technical Stack:
-- **Frontend**: React + TypeScript + CSS Modules
+- **Frontend**: React + TypeScript + CSS Modules + react-markdown
 - **Backend**: FastAPI + OpenAI Agents SDK + Gemini
-- **Vector DB**: Qdrant Cloud
+- **Vector DB**: Qdrant Cloud (with payload indexes for filtering)
 - **Embeddings**: FastEmbed (BAAI/bge-small-en-v1.5)
+- **Content**: 4 Physical AI chapters (14 chunks in Qdrant)
 
 ---
 
