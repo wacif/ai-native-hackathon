@@ -34,6 +34,44 @@ def process_markdown_file(filepath: str) -> str:
     with open(filepath, 'r', encoding='utf-8') as f:
         return f.read()
 
+def extract_metadata_from_path(relative_path: str, doc_type: str) -> dict:
+    """
+    Extract chapter_id, module_id, and page_url from file path
+    
+    Args:
+        relative_path: Relative path from base (e.g., "docs/physical-ai/chapter1.md")
+        doc_type: Type of document ("docs" or "blog")
+    
+    Returns:
+        Dictionary with metadata fields
+    """
+    path = Path(relative_path)
+    parts = path.parts
+    
+    metadata = {
+        "chapter_id": None,
+        "module_id": None,
+        "page_url": None
+    }
+    
+    if doc_type == "docs" and len(parts) >= 2:
+        # Extract module_id (e.g., "physical-ai" from "docs/physical-ai/chapter1.md")
+        if len(parts) >= 3:
+            metadata["module_id"] = parts[1]
+            # Extract chapter_id from filename (without extension)
+            metadata["chapter_id"] = path.stem
+            # Construct page URL
+            metadata["page_url"] = f"/docs/{parts[1]}/{path.stem}"
+        elif len(parts) == 2:
+            # Top-level docs file
+            metadata["chapter_id"] = path.stem
+            metadata["page_url"] = f"/docs/{path.stem}"
+    elif doc_type == "blog":
+        metadata["chapter_id"] = path.stem
+        metadata["page_url"] = f"/blog/{path.stem}"
+    
+    return metadata
+
 def collect_markdown_files(base_path: str) -> list[dict]:
     """Collect all markdown files from docs and blog directories."""
     documents = []
@@ -44,17 +82,25 @@ def collect_markdown_files(base_path: str) -> list[dict]:
     if docs_path.exists():
         for md_file in docs_path.rglob("*.md"):
             content = process_markdown_file(str(md_file))
+            relative_path = str(md_file.relative_to(base))
+            metadata = extract_metadata_from_path(relative_path, "docs")
+            
             documents.append({
                 "content": content,
-                "source": str(md_file.relative_to(base)),
-                "type": "docs"
+                "source": relative_path,
+                "type": "docs",
+                **metadata
             })
         for mdx_file in docs_path.rglob("*.mdx"):
             content = process_markdown_file(str(mdx_file))
+            relative_path = str(mdx_file.relative_to(base))
+            metadata = extract_metadata_from_path(relative_path, "docs")
+            
             documents.append({
                 "content": content,
-                "source": str(mdx_file.relative_to(base)),
-                "type": "docs"
+                "source": relative_path,
+                "type": "docs",
+                **metadata
             })
 
     # Collect from blog
@@ -62,22 +108,30 @@ def collect_markdown_files(base_path: str) -> list[dict]:
     if blog_path.exists():
         for md_file in blog_path.rglob("*.md"):
             content = process_markdown_file(str(md_file))
+            relative_path = str(md_file.relative_to(base))
+            metadata = extract_metadata_from_path(relative_path, "blog")
+            
             documents.append({
                 "content": content,
-                "source": str(md_file.relative_to(base)),
-                "type": "blog"
+                "source": relative_path,
+                "type": "blog",
+                **metadata
             })
         for mdx_file in blog_path.rglob("*.mdx"):
             content = process_markdown_file(str(mdx_file))
+            relative_path = str(mdx_file.relative_to(base))
+            metadata = extract_metadata_from_path(relative_path, "blog")
+            
             documents.append({
                 "content": content,
-                "source": str(mdx_file.relative_to(base)),
-                "type": "blog"
+                "source": relative_path,
+                "type": "blog",
+                **metadata
             })
 
     return documents
 
-def ingest_data(book_path: str = "../my-book"):
+def ingest_data(book_path: str = ".."):
     """Ingest markdown files into Qdrant using FastEmbed."""
     print("Starting data ingestion...")
 
@@ -98,7 +152,10 @@ def ingest_data(book_path: str = "../my-book"):
                 "text": chunk,
                 "source": doc["source"],
                 "type": doc["type"],
-                "chunk_id": i
+                "chunk_id": i,
+                "chapter_id": doc.get("chapter_id"),
+                "module_id": doc.get("module_id"),
+                "page_url": doc.get("page_url")
             })
 
     print(f"Created {len(all_chunks)} chunks from documents")
@@ -112,6 +169,8 @@ def ingest_data(book_path: str = "../my-book"):
 
     # Create collection with FastEmbed support
     # FastEmbed uses 384-dimensional vectors by default (all-MiniLM-L6-v2)
+    from qdrant_client.models import PayloadSchemaType
+    
     client.create_collection(
         collection_name=QDRANT_COLLECTION_NAME,
         vectors_config=VectorParams(
@@ -120,6 +179,21 @@ def ingest_data(book_path: str = "../my-book"):
         ),
     )
     print(f"Created collection '{QDRANT_COLLECTION_NAME}'")
+    
+    # Create payload indexes for filtering
+    client.create_payload_index(
+        collection_name=QDRANT_COLLECTION_NAME,
+        field_name="chapter_id",
+        field_schema=PayloadSchemaType.KEYWORD
+    )
+    print("Created index for 'chapter_id'")
+    
+    client.create_payload_index(
+        collection_name=QDRANT_COLLECTION_NAME,
+        field_name="module_id",
+        field_schema=PayloadSchemaType.KEYWORD
+    )
+    print("Created index for 'module_id'")
 
     # Initialize FastEmbed for generating embeddings
     from fastembed import TextEmbedding
@@ -142,7 +216,10 @@ def ingest_data(book_path: str = "../my-book"):
                     "text": chunk["text"],
                     "source": chunk["source"],
                     "type": chunk["type"],
-                    "chunk_id": chunk["chunk_id"]
+                    "chunk_id": chunk["chunk_id"],
+                    "chapter_id": chunk.get("chapter_id"),
+                    "module_id": chunk.get("module_id"),
+                    "page_url": chunk.get("page_url")
                 }
             )
         )
