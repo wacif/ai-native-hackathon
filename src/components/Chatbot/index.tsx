@@ -62,6 +62,13 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
     scrollToBottom();
   }, [messages]);
 
+  // Clear messages when user signs out
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setMessages([]);
+    }
+  }, [isAuthenticated]);
+
   // Listen for text selection events
   useEffect(() => {
     const handleSelection = () => {
@@ -83,6 +90,18 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
 
   const sendMessage = async (messageText: string) => {
     if (!messageText.trim()) return;
+    
+    // Don't allow sending if not authenticated
+    if (!isAuthenticated || !token) {
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'bot',
+        content: 'Please sign in to use the assistant.',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      return;
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
