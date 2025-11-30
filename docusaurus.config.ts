@@ -84,11 +84,6 @@ const config: Config = {
           label: 'GitHub',
           position: 'right',
         },
-        {
-          to: 'login',
-          label: 'Sign In',
-          position: 'right',
-        },
       ],
     },
     footer: {

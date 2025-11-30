@@ -1,6 +1,11 @@
 /**
  * Custom Navbar Item Components
- * Export all custom navbar item components here
+ * This file must export a default object that Docusaurus merges with its built-in component types
  */
-export { default as NavbarAuthButton } from './NavbarAuthButton';
+import ComponentTypes from '@theme-original/NavbarItem/ComponentTypes';
+import NavbarAuthButton from './NavbarAuthButton';
 
+export default {
+  ...ComponentTypes,
+  'custom-authButton': NavbarAuthButton,
+};
