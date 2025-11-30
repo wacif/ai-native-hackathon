@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import { useHistory } from '@docusaurus/router';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useAuth } from '../../context/AuthContext';
 import styles from './Chatbot.module.css';
 
 interface Message {
@@ -24,6 +26,8 @@ interface ChatbotProps {
 
 export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
   const { siteConfig } = useDocusaurusContext();
+  const history = useHistory();
+  const { isAuthenticated, isLoading: authLoading, token } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +37,21 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
   
   // Get API URL from customFields or use localhost for development
   const API_URL = (siteConfig.customFields?.apiUrl as string) || 'http://localhost:8000';
+  const baseUrl = siteConfig.baseUrl;
+
+  // Navigate to login page
+  const handleLoginClick = () => {
+    const loginPath = `${baseUrl}login`.replace(/\/+/g, '/');
+    history.push(loginPath);
+    setIsOpen(false);
+  };
+
+  // Navigate to signup page
+  const handleSignupClick = () => {
+    const signupPath = `${baseUrl}signup`.replace(/\/+/g, '/');
+    history.push(signupPath);
+    setIsOpen(false);
+  };
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
@@ -92,11 +111,17 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
             chapter_id: chapterId,
           };
 
+      // Build headers - include auth token if available for personalization
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(requestBody),
       });
 
@@ -158,114 +183,149 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
             <p className={styles.subtitle}>AI-powered learning assistant</p>
           </div>
 
-          {/* Selected Text Indicator */}
-          {selectedText && (
-            <div className={styles.selectionIndicator}>
-              <span className={styles.selectionIcon}>📝</span>
-              <span className={styles.selectionText}>
-                Text selected: "{selectedText.substring(0, 50)}..."
-              </span>
-              <button
-                className={styles.clearSelection}
-                onClick={() => setSelectedText('')}
-                aria-label="Clear selection"
-              >
-                ✕
-              </button>
-            </div>
-          )}
-
-          {/* Messages */}
-          <div className={styles.messagesContainer}>
-            {messages.length === 0 ? (
+          {/* Authentication Check */}
+          {authLoading ? (
+            <div className={styles.messagesContainer}>
               <div className={styles.emptyState}>
-                <p>👋 Hi! I'm your AI learning assistant.</p>
-                <p>Ask me anything about the content on this page!</p>
-                <ul className={styles.suggestions}>
-                  <li>💡 "Explain this concept"</li>
-                  <li>📖 "What's the main idea?"</li>
-                  <li>🔍 Select text and ask specific questions</li>
-                </ul>
+                <p>Loading...</p>
               </div>
-            ) : (
-              messages.map(message => (
-                <div
-                  key={message.id}
-                  className={`${styles.message} ${styles[message.type]}`}
-                >
-                  <div className={styles.messageContent}>
-                    {message.type === 'bot' ? (
-                      <ReactMarkdown 
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          // Customize markdown rendering for chatbot
-                          p: ({ children }) => <p style={{ margin: '0.5em 0' }}>{children}</p>,
-                          ul: ({ children }) => <ul style={{ margin: '0.5em 0', paddingLeft: '1.5em' }}>{children}</ul>,
-                          ol: ({ children }) => <ol style={{ margin: '0.5em 0', paddingLeft: '1.5em' }}>{children}</ol>,
-                          code: ({ node, inline, className, children, ...props }: any) => 
-                            inline ? (
-                              <code style={{ 
-                                background: 'var(--ifm-code-background)', 
-                                padding: '0.1em 0.3em',
-                                borderRadius: '3px',
-                                fontSize: '0.9em'
-                              }} {...props}>{children}</code>
-                            ) : (
-                              <code style={{ 
-                                display: 'block',
-                                background: 'var(--ifm-code-background)',
-                                padding: '0.5em',
-                                borderRadius: '4px',
-                                fontSize: '0.9em',
-                                overflowX: 'auto'
-                              }} {...props}>{children}</code>
-                            )
-                        }}
-                      >
-                        {message.content}
-                      </ReactMarkdown>
-                    ) : (
-                      message.content
-                    )}
-                  </div>
-                  {message.sources && message.sources.length > 0 && (
-                    <div className={styles.sources}>
-                      <small>
-                        Sources: {message.sources.map(s => s.type).join(', ')}
-                      </small>
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-            {isLoading && (
-              <div className={`${styles.message} ${styles.bot} ${styles.loading}`}>
-                <div className={styles.messageContent}>
-                  <span className={styles.loadingDots}>Thinking</span>
+            </div>
+          ) : !isAuthenticated ? (
+            /* Login Required Message */
+            <div className={styles.messagesContainer}>
+              <div className={styles.authRequired}>
+                <div className={styles.lockIcon}>🔒</div>
+                <h4>Sign In Required</h4>
+                <p>Please sign in or create an account to use the AI learning assistant.</p>
+                <div className={styles.authButtons}>
+                  <button 
+                    className={styles.loginButton}
+                    onClick={handleLoginClick}
+                  >
+                    Sign In
+                  </button>
+                  <button 
+                    className={styles.signupButton}
+                    onClick={handleSignupClick}
+                  >
+                    Create Account
+                  </button>
                 </div>
               </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+            </div>
+          ) : (
+            /* Authenticated User Content */
+            <>
+              {/* Selected Text Indicator */}
+              {selectedText && (
+                <div className={styles.selectionIndicator}>
+                  <span className={styles.selectionIcon}>📝</span>
+                  <span className={styles.selectionText}>
+                    Text selected: "{selectedText.substring(0, 50)}..."
+                  </span>
+                  <button
+                    className={styles.clearSelection}
+                    onClick={() => setSelectedText('')}
+                    aria-label="Clear selection"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
 
-          {/* Input Form */}
-          <form className={styles.inputForm} onSubmit={handleSubmit}>
-            <input
-              type="text"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              placeholder={selectedText ? "Ask about selected text..." : "Ask a question..."}
-              className={styles.input}
-              disabled={isLoading}
-            />
-            <button
-              type="submit"
-              className={styles.sendButton}
-              disabled={isLoading || !input.trim()}
-            >
-              ↑
-            </button>
-          </form>
+              {/* Messages */}
+              <div className={styles.messagesContainer}>
+                {messages.length === 0 ? (
+                  <div className={styles.emptyState}>
+                    <p>👋 Hi! I'm your AI learning assistant.</p>
+                    <p>Ask me anything about the content on this page!</p>
+                    <ul className={styles.suggestions}>
+                      <li>💡 "Explain this concept"</li>
+                      <li>📖 "What's the main idea?"</li>
+                      <li>🔍 Select text and ask specific questions</li>
+                    </ul>
+                  </div>
+                ) : (
+                  messages.map(message => (
+                    <div
+                      key={message.id}
+                      className={`${styles.message} ${styles[message.type]}`}
+                    >
+                      <div className={styles.messageContent}>
+                        {message.type === 'bot' ? (
+                          <ReactMarkdown 
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              // Customize markdown rendering for chatbot
+                              p: ({ children }) => <p style={{ margin: '0.5em 0' }}>{children}</p>,
+                              ul: ({ children }) => <ul style={{ margin: '0.5em 0', paddingLeft: '1.5em' }}>{children}</ul>,
+                              ol: ({ children }) => <ol style={{ margin: '0.5em 0', paddingLeft: '1.5em' }}>{children}</ol>,
+                              code: ({ node, inline, className, children, ...props }: any) => 
+                                inline ? (
+                                  <code style={{ 
+                                    background: 'var(--ifm-code-background)', 
+                                    padding: '0.1em 0.3em',
+                                    borderRadius: '3px',
+                                    fontSize: '0.9em'
+                                  }} {...props}>{children}</code>
+                                ) : (
+                                  <code style={{ 
+                                    display: 'block',
+                                    background: 'var(--ifm-code-background)',
+                                    padding: '0.5em',
+                                    borderRadius: '4px',
+                                    fontSize: '0.9em',
+                                    overflowX: 'auto'
+                                  }} {...props}>{children}</code>
+                                )
+                            }}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        ) : (
+                          message.content
+                        )}
+                      </div>
+                      {message.sources && message.sources.length > 0 && (
+                        <div className={styles.sources}>
+                          <small>
+                            Sources: {message.sources.map(s => s.type).join(', ')}
+                          </small>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+                {isLoading && (
+                  <div className={`${styles.message} ${styles.bot} ${styles.loading}`}>
+                    <div className={styles.messageContent}>
+                      <span className={styles.loadingDots}>Thinking</span>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input Form */}
+              <form className={styles.inputForm} onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  placeholder={selectedText ? "Ask about selected text..." : "Ask a question..."}
+                  className={styles.input}
+                  disabled={isLoading}
+                />
+                <button
+                  type="submit"
+                  className={styles.sendButton}
+                  disabled={isLoading || !input.trim()}
+                >
+                  ↑
+                </button>
+              </form>
+            </>
+          )}
         </div>
       )}
     </>

@@ -1,7 +1,7 @@
 """
 Authentication API endpoints for user registration, login, and profile management.
 """
-from typing import Optional
+from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, status, Form
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel, EmailStr
@@ -27,6 +27,13 @@ class SignupRequest(BaseModel):
     password: str
     software_background: Optional[str] = None
     hardware_background: Optional[str] = None
+    # New personalization fields
+    programming_languages: Optional[List[str]] = None
+    operating_system: Optional[str] = None
+    learning_goals: Optional[List[str]] = None
+    preferred_explanation_style: Optional[str] = None
+    prior_knowledge: Optional[List[str]] = None
+    industry: Optional[str] = None
 
 
 class SignupResponse(BaseModel):
@@ -60,6 +67,13 @@ class UserProfileResponse(BaseModel):
     hardware_background: Optional[str]
     personalization_preferences: Optional[dict]
     selected_language: str
+    # New personalization fields
+    programming_languages: Optional[List[str]]
+    operating_system: Optional[str]
+    learning_goals: Optional[List[str]]
+    preferred_explanation_style: Optional[str]
+    prior_knowledge: Optional[List[str]]
+    industry: Optional[str]
     created_at: str
     updated_at: str
 
@@ -70,6 +84,13 @@ class UpdateProfileRequest(BaseModel):
     hardware_background: Optional[str] = None
     selected_language: Optional[str] = None
     personalization_preferences: Optional[dict] = None
+    # New personalization fields
+    programming_languages: Optional[List[str]] = None
+    operating_system: Optional[str] = None
+    learning_goals: Optional[List[str]] = None
+    preferred_explanation_style: Optional[str] = None
+    prior_knowledge: Optional[List[str]] = None
+    industry: Optional[str] = None
 
 
 class UpdateProfileResponse(BaseModel):
@@ -116,6 +137,12 @@ async def signup(request: SignupRequest, db: Session = Depends(get_db)):
     - **password**: Minimum 8 characters with uppercase, lowercase, and digit (required)
     - **software_background**: User's software experience level (optional)
     - **hardware_background**: User's hardware experience level (optional)
+    - **programming_languages**: List of programming languages user knows (optional)
+    - **operating_system**: User's primary OS - windows/macos/linux (optional)
+    - **learning_goals**: What the user wants to learn (optional)
+    - **preferred_explanation_style**: How the user prefers content - conceptual/code-heavy/visual/step-by-step (optional)
+    - **prior_knowledge**: Topics the user already knows (optional)
+    - **industry**: User's field - student/researcher/industry/hobbyist (optional)
     """
     try:
         user = AuthService.create_user(
@@ -125,6 +152,12 @@ async def signup(request: SignupRequest, db: Session = Depends(get_db)):
             password=request.password,
             software_background=request.software_background,
             hardware_background=request.hardware_background,
+            programming_languages=request.programming_languages,
+            operating_system=request.operating_system,
+            learning_goals=request.learning_goals,
+            preferred_explanation_style=request.preferred_explanation_style,
+            prior_knowledge=request.prior_knowledge,
+            industry=request.industry,
         )
         return SignupResponse(
             message="User registered successfully",
@@ -213,6 +246,12 @@ async def get_profile(current_user = Depends(get_current_user)):
         hardware_background=current_user.hardware_background,
         personalization_preferences=current_user.personalization_preferences,
         selected_language=current_user.selected_language,
+        programming_languages=current_user.programming_languages or [],
+        operating_system=current_user.operating_system,
+        learning_goals=current_user.learning_goals or [],
+        preferred_explanation_style=current_user.preferred_explanation_style,
+        prior_knowledge=current_user.prior_knowledge or [],
+        industry=current_user.industry,
         created_at=current_user.created_at.isoformat(),
         updated_at=current_user.updated_at.isoformat(),
     )
@@ -238,6 +277,12 @@ async def update_profile(
             hardware_background=request.hardware_background,
             selected_language=request.selected_language,
             personalization_preferences=request.personalization_preferences,
+            programming_languages=request.programming_languages,
+            operating_system=request.operating_system,
+            learning_goals=request.learning_goals,
+            preferred_explanation_style=request.preferred_explanation_style,
+            prior_knowledge=request.prior_knowledge,
+            industry=request.industry,
         )
 
         return UpdateProfileResponse(
@@ -250,6 +295,12 @@ async def update_profile(
                 hardware_background=updated_user.hardware_background,
                 personalization_preferences=updated_user.personalization_preferences,
                 selected_language=updated_user.selected_language,
+                programming_languages=updated_user.programming_languages or [],
+                operating_system=updated_user.operating_system,
+                learning_goals=updated_user.learning_goals or [],
+                preferred_explanation_style=updated_user.preferred_explanation_style,
+                prior_knowledge=updated_user.prior_knowledge or [],
+                industry=updated_user.industry,
                 created_at=updated_user.created_at.isoformat(),
                 updated_at=updated_user.updated_at.isoformat(),
             )

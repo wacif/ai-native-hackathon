@@ -3,7 +3,7 @@ Authentication service for user management, password hashing, and JWT tokens.
 """
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy.orm import Session
 import bcrypt
 import jwt
@@ -97,6 +97,12 @@ class AuthService:
         password: str,
         software_background: Optional[str] = None,
         hardware_background: Optional[str] = None,
+        programming_languages: Optional[List[str]] = None,
+        operating_system: Optional[str] = None,
+        learning_goals: Optional[List[str]] = None,
+        preferred_explanation_style: Optional[str] = None,
+        prior_knowledge: Optional[List[str]] = None,
+        industry: Optional[str] = None,
     ) -> User:
         """Create a new user."""
         # Check if email already exists
@@ -120,6 +126,12 @@ class AuthService:
             password_hash=AuthService.hash_password(password),
             software_background=software_background,
             hardware_background=hardware_background,
+            programming_languages=programming_languages or [],
+            operating_system=operating_system,
+            learning_goals=learning_goals or [],
+            preferred_explanation_style=preferred_explanation_style,
+            prior_knowledge=prior_knowledge or [],
+            industry=industry,
         )
 
         db.add(user)
@@ -161,6 +173,12 @@ class AuthService:
         hardware_background: Optional[str] = None,
         selected_language: Optional[str] = None,
         personalization_preferences: Optional[dict] = None,
+        programming_languages: Optional[List[str]] = None,
+        operating_system: Optional[str] = None,
+        learning_goals: Optional[List[str]] = None,
+        preferred_explanation_style: Optional[str] = None,
+        prior_knowledge: Optional[List[str]] = None,
+        industry: Optional[str] = None,
     ) -> User:
         """Update user profile."""
         if username and username != user.username:
@@ -178,6 +196,18 @@ class AuthService:
             user.selected_language = selected_language
         if personalization_preferences is not None:
             user.personalization_preferences = personalization_preferences
+        if programming_languages is not None:
+            user.programming_languages = programming_languages
+        if operating_system is not None:
+            user.operating_system = operating_system
+        if learning_goals is not None:
+            user.learning_goals = learning_goals
+        if preferred_explanation_style is not None:
+            user.preferred_explanation_style = preferred_explanation_style
+        if prior_knowledge is not None:
+            user.prior_knowledge = prior_knowledge
+        if industry is not None:
+            user.industry = industry
 
         db.commit()
         db.refresh(user)

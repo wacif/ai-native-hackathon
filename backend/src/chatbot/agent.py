@@ -3,12 +3,13 @@ RAG Agent Module using OpenAI Agents SDK with Gemini
 """
 import os
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
 from agents import Agent, OpenAIChatCompletionsModel, Runner, set_tracing_disabled, function_tool
 from qdrant_client import QdrantClient
 from fastembed import TextEmbedding
+from dataclasses import dataclass
 
 # Load .env file from backend directory
 backend_dir = Path(__file__).resolve().parent.parent.parent
@@ -45,6 +46,17 @@ def get_embedding_model():
 
 # Disable tracing for cleaner output
 set_tracing_disabled(disabled=True)
+
+
+@dataclass
+class UserProfile:
+    """User profile for personalization"""
+    programming_languages: Optional[List[str]] = None
+    operating_system: Optional[str] = None
+    learning_goals: Optional[List[str]] = None
+    preferred_explanation_style: Optional[str] = None
+    prior_knowledge: Optional[List[str]] = None
+    industry: Optional[str] = None
 
 
 @function_tool
@@ -110,10 +122,9 @@ def search_book_content(query: str, chapter_id: str = None, limit: int = 5) -> s
         return f"Error searching book content: {str(e)}"
 
 
-# Create the RAG agent
-rag_agent = Agent(
-    name="Book Assistant",
-    instructions="""You are a helpful AI assistant that answers questions about the Physical AI & Humanoid Robotics textbook.
+def build_personalized_instructions(user_profile: Optional[UserProfile] = None) -> str:
+    """Build agent instructions based on user profile"""
+    base_instructions = """You are a helpful AI assistant that answers questions about the Physical AI & Humanoid Robotics textbook.
 
 Your capabilities:
 1. You have access to a search_book_content tool that retrieves relevant information from the book
@@ -134,16 +145,87 @@ Guidelines:
 - If you're not sure, admit it rather than making up information
 - Format your responses clearly and professionally
 - Be friendly and encouraging to learners
-""",
-    model=OpenAIChatCompletionsModel(
-        model="gemini-2.5-flash-lite",
-        openai_client=gemini_client
-    ),
-    tools=[search_book_content]
-)
+"""
+    
+    if not user_profile:
+        return base_instructions
+    
+    # Build personalization section
+    personalization_parts = ["\n\n[USER PROFILE - Personalize your responses accordingly]"]
+    
+    if user_profile.operating_system:
+        os_name = user_profile.operating_system.capitalize()
+        personalization_parts.append(f"- Operating System: {os_name}")
+        personalization_parts.append(f"  → When providing terminal commands, shell scripts, or installation instructions, use {os_name}-specific syntax and paths.")
+        if user_profile.operating_system == "windows":
+            personalization_parts.append("  → Use PowerShell or CMD commands. Use backslashes for paths. Reference Windows-specific tools.")
+        elif user_profile.operating_system == "macos":
+            personalization_parts.append("  → Use bash/zsh commands. Use forward slashes. Reference Homebrew for package management.")
+        elif user_profile.operating_system == "linux":
+            personalization_parts.append("  → Use bash commands. Use forward slashes. Reference apt/dnf/pacman as appropriate.")
+    
+    if user_profile.programming_languages:
+        langs = ", ".join(user_profile.programming_languages)
+        personalization_parts.append(f"- Preferred Programming Languages: {langs}")
+        personalization_parts.append(f"  → When providing code examples, prefer using {user_profile.programming_languages[0]} when possible.")
+        personalization_parts.append(f"  → The user is familiar with: {langs}")
+    
+    if user_profile.preferred_explanation_style:
+        style = user_profile.preferred_explanation_style
+        personalization_parts.append(f"- Preferred Explanation Style: {style}")
+        if style == "concise":
+            personalization_parts.append("  → Keep explanations brief and to the point. Use bullet points. Avoid lengthy prose.")
+        elif style == "detailed":
+            personalization_parts.append("  → Provide thorough, comprehensive explanations. Include background context and examples.")
+        elif style == "visual":
+            personalization_parts.append("  → Use ASCII diagrams, code visualizations, and structured formatting. Break down complex concepts visually.")
+        elif style == "example-driven":
+            personalization_parts.append("  → Lead with practical examples before theory. Show code/usage first, then explain.")
+    
+    if user_profile.prior_knowledge:
+        knowledge = ", ".join(user_profile.prior_knowledge)
+        personalization_parts.append(f"- Prior Knowledge: {knowledge}")
+        personalization_parts.append(f"  → You can assume familiarity with: {knowledge}. Skip basic explanations of these topics.")
+    
+    if user_profile.learning_goals:
+        goals = ", ".join(user_profile.learning_goals)
+        personalization_parts.append(f"- Learning Goals: {goals}")
+        personalization_parts.append(f"  → Emphasize content relevant to: {goals}")
+    
+    if user_profile.industry:
+        personalization_parts.append(f"- Industry/Focus Area: {user_profile.industry}")
+        personalization_parts.append(f"  → Relate examples and applications to {user_profile.industry} when relevant.")
+    
+    personalization_parts.append("\n[END USER PROFILE]")
+    
+    return base_instructions + "\n".join(personalization_parts)
 
 
-async def query_agent(question: str, context: str = None, chapter_id: str = None) -> Dict[str, Any]:
+def create_rag_agent(user_profile: Optional[UserProfile] = None) -> Agent:
+    """Create a RAG agent with optional personalization"""
+    instructions = build_personalized_instructions(user_profile)
+    
+    return Agent(
+        name="Book Assistant",
+        instructions=instructions,
+        model=OpenAIChatCompletionsModel(
+            model="gemini-2.5-flash-lite",
+            openai_client=gemini_client
+        ),
+        tools=[search_book_content]
+    )
+
+
+# Default agent (no personalization)
+rag_agent = create_rag_agent()
+
+
+async def query_agent(
+    question: str, 
+    context: str = None, 
+    chapter_id: str = None,
+    user_profile: Optional[UserProfile] = None
+) -> Dict[str, Any]:
     """
     Query the RAG agent with a question.
 
@@ -151,11 +233,15 @@ async def query_agent(question: str, context: str = None, chapter_id: str = None
         question: The user's question
         context: Optional context (e.g., selected text)
         chapter_id: Optional chapter ID for filtering results (e.g., "chapter1", "intro")
+        user_profile: Optional user profile for personalization
 
     Returns:
         Dictionary with answer and metadata
     """
     try:
+        # Create personalized agent if user profile provided, otherwise use default
+        agent = create_rag_agent(user_profile) if user_profile else rag_agent
+        
         # Prepare the query
         if context:
             prompt = f"""Context (selected text from the book):
@@ -190,14 +276,15 @@ When searching for information, use the chapter_id parameter ('{chapter_id}') in
 
         # Run the agent
         result = await Runner.run(
-            rag_agent,
+            agent,
             prompt
         )
 
         return {
             "answer": result.final_output,
             "success": True,
-            "chapter_id": chapter_id
+            "chapter_id": chapter_id,
+            "personalized": user_profile is not None
         }
 
     except Exception as e:
