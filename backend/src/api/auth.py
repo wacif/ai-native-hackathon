@@ -8,7 +8,7 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
 from ..config.db import get_db
-from ..config.auth import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS
+from ..config.auth import ACCESS_TOKEN_EXPIRE_MINUTES
 from ..services.auth_service import AuthService
 from ..utils.errors import AuthenticationException, ValidationException
 from ..utils.logger import logger

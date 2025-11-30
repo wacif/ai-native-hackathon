@@ -3,10 +3,8 @@ Qdrant service for vector database operations.
 """
 
 from typing import List, Dict, Any, Optional
-from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct, Filter
-from qdrant_client.http.exceptions import UnexpectedResponse
-from ..config.qdrant import qdrant_client, QDRANT_URL, QDRANT_API_KEY
+from ..config.qdrant import qdrant_client
 from ..utils.logger import logger
 from ..utils.errors import ExternalServiceException
 

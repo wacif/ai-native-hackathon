@@ -54,7 +54,7 @@ class TranslatedContent(Base):
         # Normalize and sort lists for consistent hashing
         profile_data = {
             "os": (operating_system or "").lower(),
-            "langs": sorted([l.lower() for l in (programming_languages or [])]),
+            "langs": sorted([lang.lower() for lang in (programming_languages or [])]),
             "style": (preferred_explanation_style or "").lower(),
             "prior": sorted([p.lower() for p in (prior_knowledge or [])]),
             "goals": sorted([g.lower() for g in (learning_goals or [])]),
