@@ -23,6 +23,13 @@ export interface User {
   hardware_background: string | null;
   personalization_preferences: Record<string, any> | null;
   selected_language: string;
+  // New personalization fields
+  programming_languages: string[];
+  operating_system: string | null;
+  learning_goals: string[];
+  preferred_explanation_style: string | null;
+  prior_knowledge: string[];
+  industry: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -39,6 +46,13 @@ interface SignupData {
   password: string;
   software_background?: string;
   hardware_background?: string;
+  // New personalization fields
+  programming_languages?: string[];
+  operating_system?: string;
+  learning_goals?: string[];
+  preferred_explanation_style?: string;
+  prior_knowledge?: string[];
+  industry?: string;
 }
 
 interface SigninData {
@@ -52,10 +66,18 @@ interface UpdateProfileData {
   hardware_background?: string;
   selected_language?: string;
   personalization_preferences?: Record<string, any>;
+  // New personalization fields
+  programming_languages?: string[];
+  operating_system?: string;
+  learning_goals?: string[];
+  preferred_explanation_style?: string;
+  prior_knowledge?: string[];
+  industry?: string;
 }
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -347,6 +369,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value: AuthContextType = {
     user,
+    token: getStoredTokens()?.access_token || null,
     isAuthenticated,
     isLoading,
     error,
