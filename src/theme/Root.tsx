@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Chatbot from '@site/src/components/Chatbot';
+import { AuthProvider } from '@site/src/context/AuthContext';
 
-// Default implementation, that you can customize
+/**
+ * Root component wrapper for Docusaurus
+ * Provides AuthProvider context and Chatbot component to all pages
+ */
 export default function Root({ children }) {
   const [pageUrl, setPageUrl] = useState('');
   const [chapterId, setChapterId] = useState('');
@@ -9,7 +13,7 @@ export default function Root({ children }) {
   useEffect(() => {
     // Get current page URL
     setPageUrl(window.location.pathname);
-    
+
     // Extract chapter ID from URL if available
     // Example: /docs/module1/chapter1 -> chapter1
     const pathParts = window.location.pathname.split('/');
@@ -25,7 +29,7 @@ export default function Root({ children }) {
     };
 
     window.addEventListener('popstate', handleNavigation);
-    
+
     // Listen for Docusaurus navigation
     const originalPushState = window.history.pushState;
     window.history.pushState = function(...args) {
@@ -40,10 +44,10 @@ export default function Root({ children }) {
   }, []);
 
   return (
-    <>
+    <AuthProvider>
       {children}
       <Chatbot pageUrl={pageUrl} chapterId={chapterId} />
-    </>
+    </AuthProvider>
   );
 }
 

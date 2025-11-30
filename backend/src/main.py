@@ -5,14 +5,18 @@ from pydantic import BaseModel
 from qdrant_client import QdrantClient
 from dotenv import load_dotenv
 from .chatbot.agent import query_agent, qdrant_client
+from .api.auth import router as auth_router
 
 load_dotenv()
 
 app = FastAPI(
-    title="RAG Chatbot API",
-    description="AI-powered chatbot with RAG capabilities using Gemini and Qdrant",
-    version="2.0.0"
+    title="Physical AI Textbook API",
+    description="AI-powered textbook with RAG chatbot, authentication, and personalization",
+    version="3.0.0"
 )
+
+# Register routers
+app.include_router(auth_router)
 
 # CORS middleware for frontend integration
 app.add_middleware(
@@ -54,13 +58,19 @@ class QueryResponse(BaseModel):
 @app.get("/")
 async def root():
     return {
-        "message": "RAG Chatbot API for PIAIC Hackathon",
+        "message": "Physical AI Textbook API",
         "status": "running",
         "endpoints": {
             "health": "/health",
             "query": "/query",
             "query_selection": "/query-selection",
-            "collections": "/collections"
+            "collections": "/collections",
+            "auth": {
+                "signup": "/auth/signup",
+                "signin": "/auth/signin",
+                "refresh": "/auth/refresh",
+                "me": "/auth/me"
+            }
         }
     }
 

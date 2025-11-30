@@ -1,12 +1,12 @@
 # API Contract: Authentication Service
 
-## Status: ⚠️ **NOT YET IMPLEMENTED**
+## Status: ✅ **IMPLEMENTED**
 
-## Planned Technology Stack
-- **Authentication**: JWT (JSON Web Tokens)
-- **Password Hashing**: bcrypt or argon2
-- **Database**: PostgreSQL (models already exist)
-- **Framework**: FastAPI with OAuth2
+## Technology Stack
+- **Authentication**: JWT (JSON Web Tokens) with pyjwt
+- **Password Hashing**: bcrypt via passlib
+- **Database**: PostgreSQL (Neon Serverless)
+- **Framework**: FastAPI with OAuth2 password flow
 
 ## Database Models: ✅ **CREATED**
 
@@ -164,17 +164,21 @@ class User(Base):
 
 ## Implementation Status
 
-### ✅ Completed
+### ✅ Completed (2025-11-29)
 - User model with all required fields
 - Database migrations
 - AuthenticationException and AuthorizationException error classes
-
-### ⏳ To Be Implemented
 - FastAPI auth router (`/auth` endpoints)
-- Password hashing utilities (bcrypt/argon2)
-- JWT token generation and validation
+- Password hashing utilities (bcrypt via passlib)
+- JWT token generation and validation (pyjwt)
 - OAuth2 password flow
 - Token refresh mechanism
+- React AuthContext with useAuth/useSession hooks
+- SignupForm with 2-step flow (credentials + background)
+- LoginForm component
+- UserButton component for navbar
+
+### ⏳ Future Enhancements
 - Rate limiting for auth endpoints
 - Email verification (optional)
 - Password reset flow (optional)
