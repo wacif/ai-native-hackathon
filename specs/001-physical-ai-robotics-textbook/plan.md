@@ -1,6 +1,6 @@
 # Implementation Plan: Physical AI & Humanoid Robotics Textbook
 
-**Branch**: `001-physical-ai-robotics-textbook` | **Date**: 2025-11-28 | **Spec**: specs/001-physical-ai-robotics-textbook/spec.md
+**Branch**: `001-physical-ai-robotics-textbook` | **Date**: 2025-11-28 | **Last Updated**: 2025-11-30 | **Spec**: specs/001-physical-ai-robotics-textbook/spec.md
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
 **Note**: This template is filled in by the `/sp.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
@@ -9,13 +9,27 @@
 
 This project aims to create an AI-native textbook for teaching Physical AI & Humanoid Robotics. It includes core textbook content, an integrated RAG chatbot, user authentication, content personalization, and Urdu translation capabilities.
 
+## Implementation Status
+
+| User Story | Status | Completion Date |
+|------------|--------|----------------|
+| US1: Core Textbook Content | ✅ Complete | 2025-11-29 |
+| US2: Integrated RAG Chatbot | ✅ Complete | 2025-11-29 |
+| US3: User Authentication | ✅ Complete | 2025-11-30 |
+| US4: Content Personalization | ✅ Complete | 2025-11-30 |
+| US5: Urdu Translation | ⏳ Not Started | - |
+
+**Live Site**: https://wacif.github.io/ai-native-hackathon/
+**PR**: https://github.com/wacif/ai-native-hackathon/pull/7
+
 ## Technical Context
 
-**Language/Version**: JavaScript (Docusaurus frontend), Python (FastAPI backend)
-**Primary Dependencies**: Docusaurus, OpenAI Agents/ChatKit SDKs, FastAPI, Neon Serverless Postgres, Qdrant Cloud, Better-Auth
-**Storage**: Neon Serverless Postgres (for RAG chatbot and user data), Qdrant Cloud (for vector embeddings)
-**Testing**: NEEDS CLARIFICATION (likely a combination of Docusaurus testing, Python unit/integration tests for FastAPI)
-**Target Platform**: GitHub Pages (Docusaurus static site), Linux server (FastAPI backend)
+**Language/Version**: TypeScript/JavaScript (Docusaurus 3.9.2 frontend), Python 3.11+ (FastAPI backend)
+**Primary Dependencies**: Docusaurus 3.9.2, OpenAI Agents SDK with Google Gemini, FastAPI, Neon Serverless Postgres, Qdrant Cloud, FastEmbed (BAAI/bge-small-en-v1.5)
+**Authentication**: FastAPI Native JWT Auth (OAuth2 + bcrypt) - *Changed from Better-Auth for simpler single-backend deployment*
+**Storage**: Neon Serverless Postgres (user data, personalized content cache), Qdrant Cloud (vector embeddings for RAG)
+**Testing**: pytest (backend), Playwright/Cypress (frontend - planned)
+**Target Platform**: GitHub Pages (Docusaurus static site), Linux server (FastAPI backend on port 8000)
 **Project Type**: Web application (Docusaurus frontend, FastAPI backend)
 **Performance Goals**:
   - SC-001: Published book accessible and content displayed correctly within 5 seconds.
@@ -39,9 +53,9 @@ This project aims to create an AI-native textbook for teaching Physical AI & Hum
 - [X] **Meta-Awareness Against Convergence**: The plan will incorporate varied teaching modalities.
 
 ### Technical Stack & Tools Alignment
-- [X] **Docusaurus**: Confirmed for book generation and GitHub Pages deployment.
-- [X] **OpenAI Agents/ChatKit SDKs, FastAPI, Neon Serverless Postgres, Qdrant Cloud**: Confirmed for RAG chatbot.
-- [X] **Better-Auth**: Confirmed for user authentication.
+- [X] **Docusaurus 3.9.2**: Confirmed for book generation and GitHub Pages deployment.
+- [X] **OpenAI Agents SDK + Gemini, FastAPI, Neon Serverless Postgres, Qdrant Cloud**: Confirmed for RAG chatbot.
+- [X] **FastAPI Native JWT Auth**: Implemented (replaced Better-Auth for simpler deployment).
 - [X] **Claude Code & Spec-Kit Plus**: Confirmed for development workflow.
 
 ### Development Workflow & Quality Gates
@@ -67,51 +81,62 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+# Docusaurus Frontend (root level)
 src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+├── components/
+│   ├── Auth/              # SignupForm, LoginForm, UserButton
+│   ├── Chatbot/           # RAG chatbot UI component
+│   ├── HomepageFeatures/  # Landing page features
+│   └── PersonalizeButton/ # Chapter personalization
+├── context/
+│   └── AuthContext.tsx    # React auth state management
+├── css/
+│   └── custom.css         # Global styles
+├── pages/
+│   ├── index.tsx          # Homepage
+│   ├── login.tsx          # Login page
+│   └── signup.tsx         # Signup page
+└── theme/
+    ├── Root.tsx           # App wrapper with providers
+    ├── DocItem/Content/   # Swizzled for personalize button
+    ├── Navbar/            # Custom navbar with auth
+    └── NavbarItem/        # Custom navbar items
 
-tests/
-├── contract/
-├── integration/
-└── unit/
+docs/
+└── physical-ai/           # Textbook chapters (intro, ch1-3)
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
+# FastAPI Backend
 backend/
 ├── src/
+│   ├── api/
+│   │   └── auth.py        # Auth endpoints (/signup, /signin, /me)
+│   ├── chatbot/
+│   │   └── agent.py       # RAG agent with personalization
+│   ├── config/
+│   │   ├── auth.py        # JWT configuration
+│   │   ├── db.py          # PostgreSQL connection
+│   │   └── qdrant.py      # Qdrant Cloud client
 │   ├── models/
+│   │   ├── user.py        # User model with personalization fields
+│   │   ├── book_content.py
+│   │   ├── chatbot_interaction.py
+│   │   └── personalized_content.py  # LLM content cache
+│   ├── rag/
+│   │   └── ingestion.py   # Content ingestion pipeline
 │   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+│   │   ├── auth_service.py
+│   │   ├── embedding_service.py
+│   │   └── qdrant_service.py
+│   └── utils/
+│       ├── logger.py
+│       └── errors.py
+├── migrations/            # Alembic migrations
+└── main.py                # FastAPI app entry point
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Web application with Docusaurus frontend at root level and FastAPI backend in `backend/` directory. This structure was chosen because Docusaurus requires root-level configuration files (`docusaurus.config.ts`, `sidebars.ts`) while keeping backend isolated.
 
 ## Project Setup Verification
 

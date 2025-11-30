@@ -1,17 +1,14 @@
 <!--
 Sync Impact Report:
-Version change: 1.1.0 -> 1.2.0 (MINOR: Added guidelines for Context7 tool and virtual environment activation)
+Version change: 1.2.3 -> 1.3.0 (MINOR: Updated Technical Stack to reflect actual implementation)
 List of modified principles:
-- II. Agent Context Requirements (Intelligence Accumulation): Research Depth Decision
-- Development Workflow & Quality Gates: Added Virtual Environment Activation
+- Technical Stack & Tools: Updated to reflect FastAPI Native JWT Auth (replaced Better-Auth)
+- Technical Stack & Tools: Added specific versions and technologies (Gemini, FastEmbed)
 Added sections: None
 Removed sections: None
 Templates requiring updates:
-- .specify/templates/plan-template.md ✅ updated
-- .specify/templates/spec-template.md ✅ updated
-- .specify/templates/tasks-template.md ✅ updated
-- .specify/templates/commands/*.md ✅ updated
-- README.md ✅ updated
+- specs/001-physical-ai-robotics-textbook/plan.md ✅ updated
+- specs/001-physical-ai-robotics-textbook/tasks.md ✅ updated
 Follow-up TODOs: None
 -->
 # Physical AI & Humanoid Robotics Textbook Constitution
@@ -190,7 +187,7 @@ Think like a relay race runner: Receive the baton cleanly, add your leg, hand of
 
 ## Technical Stack & Tools
 
-The project will utilize Docusaurus for book generation and deployment to GitHub Pages. The RAG chatbot will be built with OpenAI Agents/ChatKit SDKs, FastAPI, Neon Serverless Postgres, and Qdrant Cloud. Better-Auth will be used for Signup/Signin. Development will be driven by Claude Code and Spec-Kit Plus.
+The project utilizes Docusaurus 3.9.2 for book generation and deployment to GitHub Pages. The RAG chatbot is built with OpenAI Agents SDK (with Google Gemini as LLM), FastAPI, Neon Serverless Postgres, Qdrant Cloud, and FastEmbed (BAAI/bge-small-en-v1.5 for embeddings). **FastAPI Native JWT Auth** (OAuth2 + bcrypt) is used for Signup/Signin - chosen over Better-Auth for simpler single-backend Python deployment. Development is driven by Claude Code and Spec-Kit Plus.
 
 ## Development Workflow & Quality Gates
 
@@ -207,4 +204,4 @@ All critical environment variables MUST be managed via .env files and explicitly
 ## Governance
 This constitution serves as the foundational agreement for all development within the "Physical AI & Humanoid Robotics Textbook" project. All code contributions, architectural decisions, and feature implementations MUST adhere to these principles. Amendments to this constitution require a formal proposal, team review, and a version bump in accordance with semantic versioning rules. Compliance will be verified during code reviews and project milestones.
 
-**Version**: 1.2.3 | **Ratified**: 2025-11-28 | **Last Amended**: 2025-11-29
+**Version**: 1.3.0 | **Ratified**: 2025-11-28 | **Last Amended**: 2025-11-30

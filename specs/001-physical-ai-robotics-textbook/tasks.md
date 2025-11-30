@@ -207,7 +207,7 @@
 - [X] T042 [US3] Configure FastAPI JWT auth in `backend/src/config/auth.py` (JWT config, bcrypt settings)
 - [X] T043 [US3] Create FastAPI endpoints for user registration and login in `backend/src/api/auth.py` (/signup, /signin, /refresh, /me)
 - [X] T044 [US3] Implement `AuthService` for user management (create, login, get profile) in `backend/src/services/auth_service.py`
-- [X] T045 [P] [US3] Develop React components for signup form in `src/components/Auth/SignupForm.tsx` (2-step form with background collection)
+- [X] T045 [P] [US3] Develop React components for signup form in `src/components/Auth/SignupForm.tsx` (3-step form with personalization)
 - [X] T046 [P] [US3] Develop React components for login form in `src/components/Auth/LoginForm.tsx`
 - [X] T047 [US3] Implement frontend context/store for user authentication state in `src/context/AuthContext.tsx` (useAuth, useSession hooks)
 - [X] T048 [US3] Implement logic to collect software and hardware background during signup in `src/components/Auth/SignupForm.tsx`
@@ -215,6 +215,9 @@
 - [X] T050 [US3] Implement database migration to add new User model fields in `backend/migrations/` (already existed)
 - [X] T050.1 [US3] Create UserButton component for navbar integration in `src/components/Auth/UserButton.tsx`
 - [X] T050.2 [US3] Wrap app with AuthProvider in `src/theme/Root.tsx`
+- [X] T050.3 [US3] Restrict chatbot access to authenticated users only in `src/components/Chatbot/index.tsx`
+- [X] T050.4 [US3] Add login/signup buttons to chatbot for unauthenticated users
+- [X] T050.5 [US3] Clear chatbot messages when user signs out
 
 **Checkpoint**: At this point, User Stories 1, 2 AND 3 should all work independently
 
@@ -222,7 +225,7 @@
 
 ## ✅ **Phase 5 Completion Status**
 
-**Date**: 2025-11-29  
+**Date**: 2025-11-30  
 **Status**: ✅ **COMPLETE - User Story 3 Authentication Implemented**
 
 ### Technology Decision:
@@ -240,6 +243,8 @@
 - ✅ Two-step signup form collecting background info
 - ✅ UserButton component for navbar integration
 - ✅ Full CRUD for user profile (/auth/me)
+- ✅ Chatbot restricted to authenticated users only
+- ✅ Chat history clears on signout
 
 ### API Endpoints:
 - `POST /auth/signup` - Register new user
@@ -268,16 +273,69 @@
 - [ ] T052 [US4] Frontend integration test: Verify personalization button functionality and content adaptation in `frontend/tests/integration/test_personalization_feature.spec.js`
 
 ### Implementation for User Story 4
-- [ ] T053 [US4] Create FastAPI endpoint for content personalization requests in `backend/src/api/personalization.py`
-- [ ] T054 [US4] Implement `PersonalizationService` to dynamically adjust content based on user `software_background` and `hardware_background` in `backend/src/services/personalization_service.py`
-- [ ] T055 [US4] Add `personalized_text` (JSONB) field to `Book Content` model in `backend/src/models/book_content.py`
-- [ ] T056 [US4] Implement database migration to add `personalized_text` field to `Book Content` in `backend/migrations/`
-- [ ] T057 [US4] Develop React `PersonalizeButton` component in `frontend/src/components/PersonalizeButton.tsx`
-- [ ] T058 [US4] Integrate `PersonalizeButton` into Docusaurus chapter layout in `frontend/src/theme/DocItem/Content/index.tsx`
-- [ ] T059 [US4] Implement frontend logic to fetch and display personalized content from backend API in `frontend/src/utils/personalization_hook.ts`
-- [ ] T060 [US4] Disable personalization button if user is not logged in in `frontend/src/components/PersonalizeButton.tsx`
+- [X] T053 [US4] Create FastAPI endpoint for content personalization requests in `backend/src/main.py` (`/personalize-chapter` endpoint)
+- [X] T054 [US4] Implement personalization logic to dynamically adjust content based on user profile in `backend/src/main.py` (`build_personalization_prompt()`)
+- [X] T055 [US4] Add personalization fields to User model: `programming_languages`, `operating_system`, `learning_goals`, `preferred_explanation_style`, `prior_knowledge`, `industry` in `backend/src/models/user.py`
+- [X] T056 [US4] Create `PersonalizedContent` model for caching LLM-generated content in `backend/src/models/personalized_content.py`
+- [X] T057 [US4] Implement database migration to add personalization fields and PersonalizedContent table in `backend/migrations/versions/e7f97eb76c81_*.py`
+- [X] T058 [US4] Develop React `PersonalizeButton` component in `src/components/PersonalizeButton/index.tsx`
+- [X] T059 [US4] Swizzle Docusaurus DocItem/Content to add personalization controls in `src/theme/DocItem/Content/index.tsx`
+- [X] T060 [US4] Implement frontend logic to fetch and display personalized content from backend API
+- [X] T061 [US4] Show user profile tags (OS, languages, style) on personalization button
+- [X] T062 [US4] Add "View Original" button to revert personalized content
+- [X] T063 [US4] Disable personalization button if user is not logged in (show "Sign in to personalize")
+- [X] T064 [US4] Disable personalization if user has no preferences set (show "Update profile" prompt)
+- [X] T065 [US4] Convert signup form to 3-step wizard with chip selection in `src/components/Auth/SignupForm.tsx`
+- [X] T066 [US4] Add step indicator UI (dots + lines) to signup form
+- [X] T067 [US4] Implement chip selection for multi-select fields (programming languages, learning goals, prior knowledge)
+- [X] T068 [US4] Update API schemas to accept new personalization fields in signup/profile endpoints
+- [X] T069 [US4] Inject user profile into chatbot system prompts for personalized responses in `backend/src/chatbot/agent.py`
+- [X] T070 [US4] Create `UserProfile` dataclass and `build_personalized_instructions()` function in agent
+- [X] T071 [US4] Update `/query` and `/query-selection` endpoints to accept auth token and personalize responses
+- [X] T072 [US4] Send auth token with chatbot requests for personalized responses in `src/components/Chatbot/index.tsx`
+- [X] T073 [US4] Add `token` to AuthContext for API authentication
+- [X] T074 [US4] Cache personalized chapter content in database to avoid redundant LLM calls
 
 **Checkpoint**: At this point, User Stories 1, 2, 3 AND 4 should all work independently
+
+---
+
+## ✅ **Phase 6 Completion Status**
+
+**Date**: 2025-11-30  
+**Status**: ✅ **COMPLETE - User Story 4 Personalization Implemented**
+
+### Achievements:
+- ✅ 6 new user profile fields for personalization
+- ✅ PersonalizedContent model for caching LLM-generated content
+- ✅ `/personalize-chapter` API endpoint with content caching
+- ✅ 3-step signup wizard with chip selection UI
+- ✅ Docusaurus DocItem/Content swizzle for "Personalize for me" button
+- ✅ Chatbot system prompts inject user profile for personalized responses
+- ✅ OS-specific commands (Windows/macOS/Linux)
+- ✅ Programming language preference for code examples
+- ✅ Explanation style adaptation (concise/detailed/visual/example-driven)
+- ✅ Prior knowledge awareness (skip basic explanations)
+- ✅ Learning goals emphasis
+- ✅ Industry-specific examples
+
+### Personalization Features:
+1. **Operating System**: Commands adapted (PowerShell vs bash vs zsh)
+2. **Programming Languages**: Code examples in preferred language
+3. **Explanation Style**: Concise (bullets), Detailed (comprehensive), Visual (diagrams), Example-driven
+4. **Prior Knowledge**: Skip basic explanations for known topics
+5. **Learning Goals**: Emphasize relevant content
+6. **Industry Focus**: Relate examples to user's field
+
+### Files Created/Modified:
+- `backend/migrations/versions/e7f97eb76c81_*.py` - Migration for new fields
+- `backend/src/models/personalized_content.py` - Cache model
+- `backend/src/models/user.py` - 6 new personalization fields
+- `backend/src/chatbot/agent.py` - UserProfile, personalized instructions
+- `backend/src/main.py` - /personalize-chapter endpoint
+- `src/components/Auth/SignupForm.tsx` - 3-step wizard with chips
+- `src/theme/DocItem/Content/index.tsx` - Personalize button on docs
+- `src/context/AuthContext.tsx` - Added token to context
 
 ---
 
@@ -288,18 +346,18 @@
 **Independent Test**: Log in, navigate to a chapter, activate Urdu translation, and verify that the chapter content is accurately displayed in Urdu.
 
 ### Tests for User Story 5
-- [ ] T061 [US5] Backend unit test: Validate Urdu translation service integration (mock external service) in `backend/tests/unit/test_translation_service.py`
-- [ ] T062 [US5] Frontend integration test: Verify Urdu translation button functionality and content display in `frontend/tests/integration/test_translation_feature.spec.js`
+- [ ] T075 [US5] Backend unit test: Validate Urdu translation service integration (mock external service) in `backend/tests/unit/test_translation_service.py`
+- [ ] T076 [US5] Frontend integration test: Verify Urdu translation button functionality and content display in `frontend/tests/integration/test_translation_feature.spec.js`
 
 ### Implementation for User Story 5
-- [ ] T063 [US5] Create FastAPI endpoint for content translation requests in `backend/src/api/translation.py`
-- [ ] T064 [US5] Implement `TranslationService` to translate content to Urdu (e.g., using an external translation API or pre-translated content) in `backend/src/services/translation_service.py`
-- [ ] T065 [US5] Add `urdu_text` field to `Book Content` model in `backend/src/models/book_content.py`
-- [ ] T066 [US5] Implement database migration to add `urdu_text` field to `Book Content` in `backend/migrations/`
-- [ ] T067 [US5] Develop React `TranslateButton` component for Urdu in `frontend/src/components/TranslateButton.tsx`
-- [ ] T068 [US5] Integrate `TranslateButton` into Docusaurus chapter layout in `frontend/src/theme/DocItem/Content/index.tsx`
-- [ ] T069 [US5] Implement frontend logic to fetch and display Urdu content from backend API in `frontend/src/utils/translation_hook.ts`
-- [ ] T070 [US5] Disable translation button if user is not logged in in `frontend/src/components/TranslateButton.tsx`
+- [ ] T077 [US5] Create FastAPI endpoint for content translation requests in `backend/src/api/translation.py`
+- [ ] T078 [US5] Implement `TranslationService` to translate content to Urdu (e.g., using an external translation API or pre-translated content) in `backend/src/services/translation_service.py`
+- [ ] T079 [US5] Add `urdu_text` field to `Book Content` model in `backend/src/models/book_content.py`
+- [ ] T080 [US5] Implement database migration to add `urdu_text` field to `Book Content` in `backend/migrations/`
+- [ ] T081 [US5] Develop React `TranslateButton` component for Urdu in `frontend/src/components/TranslateButton.tsx`
+- [ ] T082 [US5] Integrate `TranslateButton` into Docusaurus chapter layout in `frontend/src/theme/DocItem/Content/index.tsx`
+- [ ] T083 [US5] Implement frontend logic to fetch and display Urdu content from backend API in `frontend/src/utils/translation_hook.ts`
+- [ ] T084 [US5] Disable translation button if user is not logged in in `frontend/src/components/TranslateButton.tsx`
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -309,15 +367,15 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T071 Setup frontend testing framework (e.g., Playwright/Cypress) in `frontend/`
-- [ ] T072 Setup backend testing framework (e.g., pytest) in `backend/`
-- [ ] T073 Configure CI/CD pipeline (GitHub Actions) for Docusaurus build/deploy to GitHub Pages in `.github/workflows/deploy.yml`
-- [ ] T074 Configure CI/CD pipeline (GitHub Actions) for backend deployment in `.github/workflows/backend_deploy.yml`
-- [ ] T075 [P] Review and update all documentation (README.md, existing docs)
-- [ ] T076 Code cleanup and refactoring across frontend and backend
-- [ ] T077 Performance optimization for content loading and API responses
-- [ ] T078 Security hardening for authentication and data handling
-- [ ] T079 Run quickstart.md validation (create quickstart.md as a separate task if needed)
+- [ ] T085 Setup frontend testing framework (e.g., Playwright/Cypress) in `frontend/`
+- [ ] T086 Setup backend testing framework (e.g., pytest) in `backend/`
+- [ ] T087 Configure CI/CD pipeline (GitHub Actions) for Docusaurus build/deploy to GitHub Pages in `.github/workflows/deploy.yml`
+- [ ] T088 Configure CI/CD pipeline (GitHub Actions) for backend deployment in `.github/workflows/backend_deploy.yml`
+- [ ] T089 [P] Review and update all documentation (README.md, existing docs)
+- [ ] T090 Code cleanup and refactoring across frontend and backend
+- [ ] T091 Performance optimization for content loading and API responses
+- [ ] T092 Security hardening for authentication and data handling
+- [ ] T093 Run quickstart.md validation (create quickstart.md as a separate task if needed)
 
 ---
 
