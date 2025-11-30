@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from typing import Optional
 from qdrant_client import QdrantClient
 from dotenv import load_dotenv
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from sqlalchemy import select
 from .chatbot.agent import query_agent, qdrant_client, UserProfile
 from .api.auth import router as auth_router, get_current_user
@@ -266,6 +266,38 @@ async def query_selected_text(
 auth_security = HTTPBearer()
 
 
+async def get_user_from_credentials(
+    credentials: HTTPAuthorizationCredentials,
+    db: Session
+) -> User:
+    """Extract user from HTTPBearer credentials."""
+    from .services.auth_service import AuthService
+    from .utils.errors import AuthenticationException
+    
+    token = credentials.credentials
+    try:
+        payload = AuthService.decode_token(token)
+        user_id = payload.get("sub")
+        token_type = payload.get("type")
+
+        if not user_id or token_type != "access":
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+        # Use AuthService to get user (sync operation)
+        user = AuthService.get_user_by_id(db, user_id)
+        
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+
+        return user
+    except AuthenticationException as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Could not validate credentials: {str(e)}")
+
+
 def build_personalization_prompt(user: User, chapter_content: str) -> str:
     """Build a prompt to personalize chapter content based on user profile"""
     profile_parts = []
@@ -339,7 +371,7 @@ PERSONALIZED CHAPTER CONTENT:"""
 async def personalize_chapter(
     request: PersonalizeChapterRequest,
     credentials: HTTPAuthorizationCredentials = Depends(auth_security),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """
     Personalize chapter content based on user's profile.
@@ -354,7 +386,7 @@ async def personalize_chapter(
 
     try:
         # Get authenticated user
-        user = await get_current_user(credentials)
+        user = await get_user_from_credentials(credentials, db)
         
         # Check if user has any personalization preferences
         has_preferences = any([
@@ -379,14 +411,11 @@ async def personalize_chapter(
         
         # Check cache if not forcing refresh
         if not request.force_refresh:
-            result = await db.execute(
-                select(PersonalizedContent).where(
-                    PersonalizedContent.user_id == user.user_id,
-                    PersonalizedContent.chapter_id == request.chapter_id,
-                    PersonalizedContent.original_content_hash == content_hash
-                )
-            )
-            cached = result.scalar_one_or_none()
+            cached = db.query(PersonalizedContent).filter(
+                PersonalizedContent.user_id == user.id,
+                PersonalizedContent.chapter_id == request.chapter_id,
+                PersonalizedContent.original_content_hash == content_hash
+            ).first()
             
             if cached:
                 return PersonalizeChapterResponse(
@@ -417,28 +446,25 @@ async def personalize_chapter(
         personalized_content = response.choices[0].message.content
         
         # Cache the result
-        # First, delete any existing entry for this user/chapter
-        existing = await db.execute(
-            select(PersonalizedContent).where(
-                PersonalizedContent.user_id == user.user_id,
-                PersonalizedContent.chapter_id == request.chapter_id
-            )
-        )
-        existing_record = existing.scalar_one_or_none()
+        # First, check for existing entry for this user/chapter
+        existing_record = db.query(PersonalizedContent).filter(
+            PersonalizedContent.user_id == user.id,
+            PersonalizedContent.chapter_id == request.chapter_id
+        ).first()
         
         if existing_record:
             existing_record.original_content_hash = content_hash
             existing_record.personalized_content = personalized_content
         else:
             new_record = PersonalizedContent(
-                user_id=user.user_id,
+                user_id=user.id,
                 chapter_id=request.chapter_id,
                 original_content_hash=content_hash,
                 personalized_content=personalized_content
             )
             db.add(new_record)
         
-        await db.commit()
+        db.commit()
         
         return PersonalizeChapterResponse(
             personalized_content=personalized_content,

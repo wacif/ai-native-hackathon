@@ -36,6 +36,40 @@
   cursor: not-allowed;
 }
 
+.translateButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #00695c, #004d40);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+  transition: all 0.2s ease;
+  direction: rtl;
+}
+
+.translateButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #004d40, #00352e);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.translateButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.translateButton.active {
+  background: linear-gradient(135deg, #1976d2, #1565c0);
+  direction: ltr;
+  font-family: inherit;
+}
+
 .icon {
   font-size: 1.1rem;
 }
