@@ -2,131 +2,174 @@
 sidebar_position: 1
 ---
 
-# Introduction to Physical AI & Humanoid Robotics
+# Physical AI & Humanoid Robotics
 
-Welcome to the fascinating world of Physical AI and Humanoid Robotics! This textbook will guide you through the fundamental concepts, technologies, and applications that are shaping the future of intelligent physical systems.
+> **Bridging the gap between the digital brain and the physical body.**
 
-## What is Physical AI?
+Welcome to the capstone quarter on **Physical AI & Humanoid Robotics**. This course introduces AI systems that function in reality and comprehend physical laws. You'll learn to design, simulate, and deploy humanoid robots capable of natural human interactions.
 
-Physical AI refers to artificial intelligence systems that interact with and manipulate the physical world. Unlike traditional AI that operates purely in digital spaces, Physical AI combines:
+## Why Physical AI Matters
 
-- **Perception**: Sensing and understanding the physical environment
-- **Reasoning**: Making intelligent decisions based on sensory input
-- **Action**: Physically interacting with and manipulating the world
+The future of AI extends beyond digital spaces into the physical world. Humanoid robots are poised to excel in our human-centered world because they:
 
-## Why Humanoid Robotics?
+- **Share our physical form** and can navigate human environments
+- **Can be trained with abundant data** from human interactions
+- **Represent a transition** from AI confined to digital environments to **embodied intelligence** operating in physical space
 
-Humanoid robots are designed to mimic human form and behavior. They represent one of the most challenging and exciting applications of Physical AI because:
+This isn't just robotics—it's **AI that lives in the real world**.
 
-1. **Human-Centric Design**: Our world is built for humans, so humanoid form factors allow robots to navigate existing infrastructure
-2. **Natural Interaction**: Human-like appearance and behavior make robots more intuitive for people to interact with
-3. **Versatility**: Bipedal locomotion and human-like manipulation enable robots to perform a wide variety of tasks
-4. **Research Platform**: Humanoid robots serve as testbeds for advancing AI, control theory, and mechanical engineering
+## Course Overview
 
-## Historical Context
+| Module | Focus | Key Technologies |
+|--------|-------|------------------|
+| **Module 1** | The Robotic Nervous System | ROS 2, rclpy, URDF |
+| **Module 2** | The Digital Twin | Gazebo, Unity, Sensors |
+| **Module 3** | The AI-Robot Brain | NVIDIA Isaac, VSLAM, Nav2 |
+| **Module 4** | Vision-Language-Action | Whisper, LLMs, VLA Models |
 
-The journey of humanoid robotics spans several decades:
+## Learning Outcomes
 
-- **1970s**: Early research robots like WABOT-1 at Waseda University demonstrated basic walking and conversation
-- **1990s**: Honda's P-series robots pioneered dynamic walking and balance control
-- **2000s**: ASIMO became the icon of humanoid robotics, showcasing advanced mobility
-- **2010s**: Boston Dynamics' Atlas demonstrated unprecedented agility and dynamic movement
-- **2020s**: AI-native humanoid robots like Tesla Optimus and Figure 01 integrate large language models and learned behaviors
+By the end of this course, you will:
 
-## Key Components of Humanoid Robots
+✅ Understand Physical AI principles and embodied intelligence  
+✅ Master **ROS 2** (Robot Operating System) for robotic control  
+✅ Simulate robots with **Gazebo** and **Unity**  
+✅ Develop with **NVIDIA Isaac** AI robot platform  
+✅ Design humanoid robots for natural interactions  
+✅ Integrate **GPT models** for conversational robotics  
+✅ Build a complete **Voice-to-Action** pipeline  
 
-A humanoid robot is a complex integration of multiple systems:
+## Weekly Breakdown
 
-### 1. Mechanical Structure
-- **Skeleton**: Rigid frame providing structural support
-- **Joints**: Rotational and linear actuators enabling movement
-- **End Effectors**: Hands, grippers, or specialized tools for manipulation
+### Weeks 1-2: Introduction to Physical AI
+- Foundations of Physical AI and embodied intelligence
+- From digital AI to robots that understand physical laws
+- Overview of humanoid robotics landscape
+- Sensor systems: LiDAR, cameras, IMUs, force/torque sensors
 
-### 2. Actuation Systems
-- **Electric Motors**: Precise control, commonly used in research platforms
-- **Hydraulics**: High power-to-weight ratio for dynamic movements
-- **Pneumatics**: Compliant, safe interaction with humans
+### Weeks 3-5: ROS 2 Fundamentals
+- ROS 2 architecture and core concepts
+- Nodes, topics, services, and actions
+- Building ROS 2 packages with Python
+- Launch files and parameter management
 
-### 3. Sensory Systems
-- **Vision**: Cameras for visual perception and navigation
-- **Proprioception**: Joint encoders and IMUs for body state awareness
-- **Tactile**: Force/torque sensors and touch sensors for manipulation
-- **Auditory**: Microphones for speech recognition and sound localization
+### Weeks 6-7: Robot Simulation
+- Gazebo simulation environment setup
+- URDF and SDF robot description formats
+- Physics simulation and sensor simulation
+- Introduction to Unity for robot visualization
 
-### 4. Computational Intelligence
-- **Perception AI**: Computer vision, object detection, scene understanding
-- **Planning AI**: Path planning, task planning, decision making
-- **Control AI**: Balance control, locomotion, manipulation
-- **Language AI**: Natural language understanding and generation
+### Weeks 8-10: NVIDIA Isaac Platform
+- NVIDIA Isaac SDK and Isaac Sim
+- AI-powered perception and manipulation
+- Reinforcement learning for robot control
+- Sim-to-real transfer techniques
 
-## Course Structure
+### Weeks 11-12: Humanoid Robot Development
+- Humanoid robot kinematics and dynamics
+- Bipedal locomotion and balance control
+- Manipulation and grasping with humanoid hands
+- Natural human-robot interaction design
 
-This textbook is organized into four comprehensive modules:
+### Week 13: Conversational Robotics & Capstone
+- Integrating GPT models for conversational AI
+- Speech recognition and natural language understanding
+- Multi-modal interaction: speech, gesture, vision
+- **Capstone Project Presentation**
 
-**Module 1: Foundations** (Chapters 1-4)
-- Introduction to Physical AI and Robotics
-- Robot Sensors and Perception
-- Actuators and Movement Control
-- AI Algorithms for Robotics
+## Assessments
 
-**Module 2: Locomotion and Manipulation** (Chapters 5-8)
-- Bipedal Walking and Balance
-- Upper Body Control and Manipulation
-- Whole-Body Motion Planning
-- Human-Robot Interaction
+| Assessment | Weight | Description |
+|------------|--------|-------------|
+| ROS 2 Package | 20% | Build a working ROS 2 package with Python |
+| Gazebo Simulation | 25% | Implement a complete simulation environment |
+| Isaac Perception | 25% | Create an AI-powered perception pipeline |
+| **Capstone** | 30% | Simulated humanoid with conversational AI |
 
-**Module 3: Intelligence and Learning** (Chapters 9-12)
-- Machine Learning for Robotics
-- Reinforcement Learning for Control
-- Vision-Language-Action Models
-- Real-World Deployment Challenges
+## The Capstone Project
 
-**Module 4: Applications and Future** (Chapters 13-16)
-- Manufacturing and Industrial Robotics
-- Service and Healthcare Robotics
-- Search and Rescue Operations
-- The Future of Humanoid Robotics
+Your final project: **The Autonomous Humanoid**
 
-## Learning Objectives
+Build a simulated humanoid robot that:
+1. 🎤 Receives a **voice command** (e.g., "Clean the room")
+2. 🧠 Uses an **LLM** to plan a sequence of actions
+3. 🗺️ Plans a **path** through the environment
+4. 🚶 **Navigates** around obstacles
+5. 👁️ **Identifies objects** using computer vision
+6. 🤖 **Manipulates** the target object
 
-By the end of this course, you will be able to:
+This is the convergence of everything you'll learn: ROS 2, simulation, perception, planning, and AI.
 
-1. Understand the fundamental principles of Physical AI and humanoid robotics
-2. Design and analyze sensory systems for robotic perception
-3. Implement control algorithms for robot locomotion and manipulation
-4. Apply machine learning techniques to robotic systems
-5. Evaluate the ethical and societal implications of humanoid robotics
-6. Develop practical skills for building and programming robotic systems
+## Hardware Requirements
+
+This course sits at the intersection of three heavy computational loads:
+- **Physics Simulation** (Isaac Sim/Gazebo)
+- **Visual Perception** (SLAM/Computer Vision)
+- **Generative AI** (LLMs/VLA models)
+
+### Minimum Workstation Requirements
+
+| Component | Requirement | Notes |
+|-----------|-------------|-------|
+| **GPU** | NVIDIA RTX 4070 Ti (12GB) | RTX required for Isaac Sim |
+| **CPU** | Intel i7 13th Gen / AMD Ryzen 9 | Physics is CPU-intensive |
+| **RAM** | 64 GB DDR5 | 32GB minimum, 64GB recommended |
+| **OS** | Ubuntu 22.04 LTS | ROS 2 is native to Linux |
+
+### The Jetson Student Kit (~$700)
+
+For edge deployment and "Physical AI" learning:
+
+| Component | Model | Price |
+|-----------|-------|-------|
+| Brain | NVIDIA Jetson Orin Nano Super (8GB) | $249 |
+| Eyes | Intel RealSense D435i | $349 |
+| Ears | ReSpeaker USB Mic Array v2.0 | $69 |
+| Storage | 128GB High-endurance SD Card | $30 |
+
+### Cloud Alternative
+
+If you don't have RTX hardware:
+- **AWS g5.2xlarge** instance with A10G GPU
+- ~$205/quarter for 120 hours of usage
+- Train in cloud → Deploy to local Jetson
 
 ## Prerequisites
 
-This course assumes basic knowledge of:
+This course assumes:
 
-- **Mathematics**: Linear algebra, calculus, probability and statistics
-- **Programming**: Python or C++ programming experience
-- **Physics**: Basic mechanics and dynamics
+- **Python**: Intermediate programming skills
+- **Linux**: Basic command-line familiarity
+- **AI/ML**: Understanding of neural networks
+- **Math**: Linear algebra, basic calculus
 
-Don't worry if you're not an expert in all these areas—we'll review key concepts as needed throughout the course.
+Don't worry if you're rusty—we'll review concepts as needed!
 
 ## How to Use This Textbook
 
 Each chapter includes:
 
-- **Conceptual Explanations**: Clear descriptions of key ideas
-- **Mathematical Foundations**: Equations and derivations for deeper understanding
-- **Code Examples**: Python implementations of algorithms and techniques
-- **Real-World Applications**: Case studies from industry and research
-- **Exercises**: Hands-on problems to reinforce learning
+- 📖 **Clear explanations** of concepts
+- 💻 **Code examples** you can run
+- 🔧 **Hands-on exercises** to build skills
+- 🤖 **AI chatbot** - ask questions about any content!
+- 🌐 **Personalization** - content adapts to your OS and preferences
 
-We also provide an **AI-powered chatbot** that can answer your questions about the content. Simply select any text and ask for clarification, examples, or deeper explanations!
+Select any text and ask the chatbot for clarification, examples, or deeper explanations.
 
-## Let's Begin!
+## Let's Begin! 🚀
 
-Physical AI and humanoid robotics represent one of the most exciting frontiers in technology. These systems have the potential to transform industries, assist humans in dangerous tasks, and enhance our quality of life. 
+Physical AI represents one of the most exciting frontiers in technology. You'll learn to build robots that can:
 
-The journey ahead is challenging but rewarding. Let's dive in and explore the incredible world of robots that can think, sense, and act in our physical world!
+- **Think** using AI and LLMs
+- **See** using computer vision
+- **Move** using control systems
+- **Speak** using conversational AI
+- **Act** in the physical world
+
+The journey is challenging but rewarding. Let's dive in!
 
 ---
 
-**Next Chapter**: [Robot Sensors and Perception →](./chapter1.md)
+**Next**: [Module 1: The Robotic Nervous System (ROS 2) →](./module1-ros2)
 
