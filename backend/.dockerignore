@@ -1,0 +1,10 @@
+# Fly.io ignores
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.local
+*.log
+.git/
+.gitignore
+logs/

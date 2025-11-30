@@ -21,7 +21,7 @@ function PersonalizeControls(): React.ReactElement | null {
   const [chapterId, setChapterId] = useState<string>('');
   const [mounted, setMounted] = useState(false);
 
-  const API_URL = (siteConfig.customFields?.apiUrl as string) || 'http://localhost:8000';
+  const API_URL = (siteConfig.customFields?.apiUrl as string) || 'https://physical-ai-textbook-api.fly.dev';
   const BASE_URL = siteConfig.baseUrl || '/ai-native-hackathon/';
 
   useEffect(() => {

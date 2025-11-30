@@ -36,7 +36,7 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Get API URL from customFields or use localhost for development
-  const API_URL = (siteConfig.customFields?.apiUrl as string) || 'http://localhost:8000';
+  const API_URL = (siteConfig.customFields?.apiUrl as string) || 'https://physical-ai-textbook-api.fly.dev';
   const baseUrl = siteConfig.baseUrl;
 
   // Navigate to login page
