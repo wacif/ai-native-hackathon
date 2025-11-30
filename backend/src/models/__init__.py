@@ -7,6 +7,7 @@ from .user import User
 from .book_content import BookContent
 from .chatbot_interaction import ChatbotInteraction
 from .personalized_content import PersonalizedContent
+from .translated_content import TranslatedContent
 
 __all__ = [
     "Base",
@@ -14,5 +15,6 @@ __all__ = [
     "BookContent",
     "ChatbotInteraction",
     "PersonalizedContent",
+    "TranslatedContent",
 ]
 
