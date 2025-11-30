@@ -1,14 +1,14 @@
 import os
 import hashlib
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional
-from qdrant_client import QdrantClient
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+import html
 from .chatbot.agent import query_agent, qdrant_client, UserProfile
 from .api.auth import router as auth_router, get_current_user
 from .models.user import User
@@ -17,22 +17,30 @@ from .config.db import get_db
 
 load_dotenv()
 
+# Get allowed origins from environment or use defaults
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,https://wacif.github.io").split(",")
+
 app = FastAPI(
     title="Physical AI Textbook API",
     description="AI-powered textbook with RAG chatbot, authentication, and personalization",
-    version="3.0.0"
+    version="3.0.0",
+    docs_url="/docs" if os.getenv("ENVIRONMENT", "development") != "production" else None,
+    redoc_url="/redoc" if os.getenv("ENVIRONMENT", "development") != "production" else None,
 )
 
 # Register routers
 app.include_router(auth_router)
 
+# Security: Trusted Host middleware (optional, enable in production)
+# app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "*.github.io"])
+
 # CORS middleware for frontend integration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify your Docusaurus domain
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 # Environment variables
@@ -58,13 +66,29 @@ def build_user_profile(user: Optional[User]) -> Optional[UserProfile]:
         industry=user.industry
     )
 
-# Request models
+# Request models with validation
 class QueryRequest(BaseModel):
     question: str
     user_id: str | None = None  # Optional, for logging
     page_url: str | None = None  # Current page URL for context
     chapter_id: str | None = None  # Optional chapter ID
     max_results: int = 5
+    
+    @field_validator('question')
+    @classmethod
+    def validate_question(cls, v: str) -> str:
+        if not v or len(v.strip()) < 2:
+            raise ValueError('Question must be at least 2 characters')
+        if len(v) > 2000:
+            raise ValueError('Question must be less than 2000 characters')
+        return html.escape(v.strip())
+    
+    @field_validator('max_results')
+    @classmethod
+    def validate_max_results(cls, v: int) -> int:
+        if v < 1 or v > 20:
+            raise ValueError('max_results must be between 1 and 20')
+        return v
 
 class TextSelectionRequest(BaseModel):
     question: str
@@ -72,11 +96,51 @@ class TextSelectionRequest(BaseModel):
     user_id: str | None = None  # Optional, for logging
     page_url: str | None = None  # Current page URL
     chapter_id: str | None = None  # Optional chapter ID
+    
+    @field_validator('question')
+    @classmethod
+    def validate_question(cls, v: str) -> str:
+        if not v or len(v.strip()) < 2:
+            raise ValueError('Question must be at least 2 characters')
+        if len(v) > 2000:
+            raise ValueError('Question must be less than 2000 characters')
+        return html.escape(v.strip())
+    
+    @field_validator('selected_text')
+    @classmethod
+    def validate_selected_text(cls, v: str) -> str:
+        if not v or len(v.strip()) < 1:
+            raise ValueError('Selected text cannot be empty')
+        if len(v) > 5000:
+            raise ValueError('Selected text must be less than 5000 characters')
+        return v.strip()
 
 class PersonalizeChapterRequest(BaseModel):
     chapter_id: str
     chapter_content: str  # The markdown content of the chapter
     force_refresh: bool = False  # Force regeneration even if cached
+    
+    @field_validator('chapter_id')
+    @classmethod
+    def validate_chapter_id(cls, v: str) -> str:
+        if not v or len(v.strip()) < 1:
+            raise ValueError('Chapter ID cannot be empty')
+        if len(v) > 100:
+            raise ValueError('Chapter ID must be less than 100 characters')
+        # Only allow alphanumeric, hyphens, and underscores
+        import re
+        if not re.match(r'^[a-zA-Z0-9_-]+$', v):
+            raise ValueError('Chapter ID can only contain letters, numbers, hyphens, and underscores')
+        return v.strip()
+    
+    @field_validator('chapter_content')
+    @classmethod
+    def validate_chapter_content(cls, v: str) -> str:
+        if not v or len(v.strip()) < 10:
+            raise ValueError('Chapter content must be at least 10 characters')
+        if len(v) > 100000:  # 100KB limit
+            raise ValueError('Chapter content must be less than 100KB')
+        return v
 
 class PersonalizeChapterResponse(BaseModel):
     personalized_content: str

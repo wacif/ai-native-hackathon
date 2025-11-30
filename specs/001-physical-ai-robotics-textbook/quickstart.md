@@ -1,81 +1,151 @@
 # Quickstart Guide: Physical AI & Humanoid Robotics Textbook
 
-This guide provides a quick overview of how to set up and run the "Physical AI & Humanoid Robotics Textbook" project locally.
+Get the project running in under 10 minutes.
 
-## 1. Prerequisites
+## Prerequisites
 
-Ensure you have the following installed:
+- **Node.js** v20+ with npm
+- **Python** 3.11+
+- **Git**
 
-*   **Node.js** (LTS version) and **npm** or **Yarn** (for Docusaurus frontend)
-*   **Python 3.9+** and **pip** (for FastAPI backend)
-*   **Git**
-*   **Docker** (optional, for easier database/Qdrant setup)
+### External Services (free tiers available)
+- [Neon](https://neon.tech) - Serverless PostgreSQL
+- [Qdrant Cloud](https://qdrant.tech) - Vector database
+- [Google AI Studio](https://aistudio.google.com) - Gemini API key
 
-## 2. Project Setup
+## Quick Start
 
-1.  **Clone the repository**:
-    ```bash
-    git clone git@github.com:wacif/ai-native-hackathon.git
-    cd ai-native-hackathon
-    ```
+### 1. Clone & Install Frontend
 
-2.  **Frontend (Docusaurus) Setup**:
-    ```bash
-    npm install # or yarn install
-    ```
+```bash
+git clone git@github.com:wacif/ai-native-hackathon.git
+cd ai-native-hackathon
+npm install
+```
 
-3.  **Backend (FastAPI) Setup**:
-    ```bash
-    cd backend
-    pip install -r requirements.txt
-    cd ..
-    ```
-
-4.  **Database (Neon Serverless Postgres)**:
-    *   Create a Neon project and obtain your connection string.
-    *   Set the connection string as an environment variable (e.g., `DATABASE_URL`).
-
-5.  **Vector Database (Qdrant Cloud)**:
-    *   Create a Qdrant Cloud account and get your API key and URL.
-    *   Set these as environment variables (e.g., `QDRANT_URL`, `QDRANT_API_KEY`).
-
-6.  **OpenAI API Key** (for RAG chatbot):
-    *   Obtain an OpenAI API key.
-    *   Set it as an environment variable (e.g., `OPENAI_API_KEY`).
-
-7.  **Better-Auth Credentials** (optional, if implementing authentication):
-    *   Set up an account with Better-Auth.
-    *   Configure necessary environment variables for client ID, secret, etc.
-
-## 3. Running the Project
-
-### 1. Start the FastAPI Backend
-
-From the project root, navigate to the `backend` directory and run:
+### 2. Install Backend
 
 ```bash
 cd backend
-uvicorn main:app --reload
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-The backend API will be available at `http://localhost:8000` (or configured port).
+### 3. Configure Environment
 
-### 2. Start the Docusaurus Frontend
+Create `backend/.env`:
 
-From the project root, run:
+```env
+# Database (Neon Serverless Postgres)
+DATABASE_URL=postgresql://user:pass@host:5432/db
+
+# Vector Database (Qdrant Cloud)
+QDRANT_URL=https://your-cluster.qdrant.io
+QDRANT_API_KEY=your-qdrant-api-key
+
+# AI (Google Gemini)
+GEMINI_API_KEY=your-gemini-api-key
+
+# Auth (generate a secure random string)
+JWT_SECRET_KEY=your-secret-key-minimum-32-characters
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+REFRESH_TOKEN_EXPIRE_DAYS=7
+```
+
+### 4. Initialize Database
 
 ```bash
-npm start # or yarn start
+cd backend
+source .venv/bin/activate
+alembic upgrade head
 ```
 
-The Docusaurus development server will start, and the textbook will be accessible in your browser, typically at `http://localhost:3000`.
+### 5. Ingest Book Content
 
-## 4. Deployment to GitHub Pages
+```bash
+python -m src.rag.ingestion
+```
 
-The Docusaurus project is configured for deployment to GitHub Pages. Ensure your `docusaurus.config.js` is correctly configured with your repository name. The deployment will typically be handled via GitHub Actions upon pushing to the `main` (or `gh-pages`) branch.
+### 6. Start Servers
 
-## 5. Next Steps
+**Terminal 1 - Backend:**
+```bash
+cd backend
+source .venv/bin/activate
+uvicorn src.main:app --host 0.0.0.0 --port 8000
+```
 
-*   Populate the `docs/` directory with your textbook content.
-*   Implement the RAG chatbot logic within the `backend/` services.
-*   Integrate authentication, personalization, and translation features as per the specification.
+**Terminal 2 - Frontend:**
+```bash
+npm start
+```
+
+### 7. Access the App
+
+- **Frontend**: http://localhost:3000/ai-native-hackathon/
+- **Backend API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
+
+## Test Features
+
+1. **Signup**: Create an account with your preferences
+2. **Chatbot**: Ask questions about Physical AI topics
+3. **Text Selection**: Highlight text and ask specific questions
+4. **Personalize**: Click "Personalize for me" on any chapter
+5. **Translate**: Click "اردو" to view Urdu translation
+
+## Common Issues
+
+### Port already in use
+```bash
+# Kill process on port 8000
+lsof -ti:8000 | xargs kill -9
+# Kill process on port 3000
+lsof -ti:3000 | xargs kill -9
+```
+
+### Database connection error
+- Verify `DATABASE_URL` in `.env`
+- Check Neon dashboard for connection status
+
+### Qdrant connection error
+- Verify `QDRANT_URL` and `QDRANT_API_KEY`
+- Check Qdrant Cloud dashboard
+
+### Module not found
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
+## Development Workflow
+
+```bash
+# Frontend hot reload
+npm start
+
+# Backend hot reload
+uvicorn src.main:app --reload
+
+# Run linting
+cd backend && ruff check src/
+
+# Run type checking
+npm run typecheck
+```
+
+## Deployment
+
+### Frontend (GitHub Pages)
+Automatic deployment via GitHub Actions on push to `main` branch.
+
+### Backend
+Deploy to any Python-compatible platform (Railway, Render, Fly.io, etc.)
+
+## Need Help?
+
+- Check `/specs` for detailed specifications
+- Review `/history/prompts` for development context
+- Open an issue on GitHub

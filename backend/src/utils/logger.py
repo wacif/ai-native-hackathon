@@ -4,7 +4,6 @@ Logging configuration for the Physical AI & Humanoid Robotics Textbook backend.
 
 import logging
 import sys
-from typing import Any
 from pathlib import Path
 
 # Create logs directory if it doesn't exist

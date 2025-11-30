@@ -2,7 +2,6 @@
 Embedding service for generating embeddings using OpenAI or other providers.
 """
 
-import os
 from typing import List
 from dotenv import load_dotenv
 from fastembed import TextEmbedding
