@@ -126,7 +126,7 @@ async def health_check():
         "qdrant": qdrant_status,
         "collection_exists": collection_exists,
         "gemini_configured": GEMINI_API_KEY is not None,
-        "agent": "gemini-2.5-flash-lite"
+        "agent": "gemini-2.5-flash"
     }
 
 @app.get("/collections")
@@ -350,16 +350,64 @@ def build_personalization_prompt(user: User, chapter_content: str) -> str:
 USER PROFILE:
 {profile_section}
 
-INSTRUCTIONS:
-1. Adapt the content to match the user's operating system for any commands or file paths
+=== STRICT OUTPUT FORMAT RULES ===
+You MUST follow these markdown formatting rules EXACTLY. Failure to follow these rules will break the page rendering.
+
+1. HEADINGS: Use # for h1, ## for h2, ### for h3. Always have a blank line before and after headings.
+   Example:
+   
+   ## Section Title
+   
+   Content here...
+
+2. PARAGRAPHS: Separate paragraphs with a blank line. Never run paragraphs together.
+
+3. CODE BLOCKS: ALWAYS use triple backticks with language identifier. NEVER omit the language.
+   CORRECT:
+   ```python
+   print("hello")
+   ```
+   
+   ```bash
+   pip install numpy
+   ```
+   
+   WRONG: ``` without language, or indented code blocks
+
+4. INLINE CODE: Use single backticks for inline code: `variable_name`
+
+5. LISTS: Use - or * for unordered lists, 1. 2. 3. for ordered lists. Have a blank line before the list.
+   Example:
+   
+   Here are the steps:
+   
+   - First item
+   - Second item
+
+6. BOLD/ITALIC: Use **bold** and *italic* - ensure matching pairs.
+
+7. LINKS: Use [text](url) format.
+
+8. BLOCKQUOTES: Use > at the start of the line.
+
+9. NO HTML TAGS: Do not use any HTML tags like <p>, <br>, <div>, etc.
+
+10. NO FRONTMATTER: Do not include --- yaml frontmatter.
+
+=== CONTENT PERSONALIZATION ===
+1. Adapt commands and file paths to the user's operating system
 2. Use code examples in the user's preferred programming language when applicable
-3. Adjust the explanation depth based on their preferred style
+3. Adjust explanation depth based on their preferred style
 4. Skip or condense explanations for topics they already know
 5. Emphasize content relevant to their learning goals
 6. Add industry-specific examples when relevant
 7. Maintain the original structure (headings, sections) but adapt the content
-8. Keep markdown formatting intact
-9. Do NOT add any meta-commentary - just output the personalized content
+
+=== CRITICAL ===
+- Output ONLY the personalized markdown content
+- Do NOT add any meta-commentary, explanations, or notes about what you changed
+- Do NOT wrap the output in any code blocks
+- Start directly with the content (heading or paragraph)
 
 ORIGINAL CHAPTER CONTENT:
 {chapter_content}
@@ -435,12 +483,12 @@ async def personalize_chapter(
         prompt = build_personalization_prompt(user, request.chapter_content)
         
         response = await gemini_client.chat.completions.create(
-            model="gemini-2.5-flash-lite",
+            model="gemini-2.5-flash",
             messages=[
                 {"role": "user", "content": prompt}
             ],
             max_tokens=8000,
-            temperature=0.3  # Lower temperature for more consistent output
+            temperature=0.2  # Lower temperature for more consistent formatting
         )
         
         personalized_content = response.choices[0].message.content

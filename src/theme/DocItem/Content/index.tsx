@@ -57,7 +57,11 @@ function PersonalizeControls(): React.ReactElement | null {
     setError(null);
 
     try {
-      const articleElement = document.querySelector('article.markdown');
+      // Try multiple selectors to find the article content
+      const articleElement = document.querySelector('.markdown') || 
+                            document.querySelector('article') ||
+                            document.querySelector('[class*="docItemCol"]') ||
+                            document.querySelector('.theme-doc-markdown');
       if (!articleElement) {
         throw new Error('Could not find article content');
       }
@@ -84,18 +88,10 @@ function PersonalizeControls(): React.ReactElement | null {
       const data = await response.json();
       sessionStorage.setItem(`original_${chapterId}`, originalContent);
       
-      const container = document.createElement('div');
-      container.innerHTML = data.personalized_content
-        .replace(/\n/g, '<br>')
-        .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
-        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-        .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-        .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-        .replace(/^### (.*$)/gm, '<h3>$1</h3>');
+      // Use the markdown converter for proper formatting
+      const htmlContent = convertMarkdownToHtml(data.personalized_content);
       
-      articleElement.innerHTML = container.innerHTML;
+      articleElement.innerHTML = htmlContent;
       setIsPersonalized(true);
     } catch (err) {
       console.error('Error personalizing content:', err);
@@ -108,7 +104,11 @@ function PersonalizeControls(): React.ReactElement | null {
   const handleRevert = useCallback(() => {
     const original = sessionStorage.getItem(`original_${chapterId}`);
     if (original) {
-      const articleElement = document.querySelector('article.markdown');
+      // Try multiple selectors to find the article content
+      const articleElement = document.querySelector('.markdown') || 
+                            document.querySelector('article') ||
+                            document.querySelector('[class*="docItemCol"]') ||
+                            document.querySelector('.theme-doc-markdown');
       if (articleElement) {
         articleElement.innerHTML = original;
         setIsPersonalized(false);
@@ -186,6 +186,242 @@ function PersonalizeControls(): React.ReactElement | null {
     }
   }, [chapterId, isUrduMode, BASE_URL]);
 
+  // Escape HTML entities
+  const escapeHtml = (text: string): string => {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  };
+
+  // Syntax highlighter for code blocks
+  const highlightSyntax = (code: string, lang: string): string => {
+    const escaped = escapeHtml(code);
+    const language = lang.toLowerCase();
+    
+    // Define token patterns and colors for VS Code Dark+ theme
+    const highlight = (text: string, patterns: Array<{regex: RegExp, color: string}>): string => {
+      // Create placeholders to avoid double-matching
+      const placeholders: string[] = [];
+      let result = text;
+      
+      patterns.forEach(({regex, color}) => {
+        result = result.replace(regex, (match) => {
+          const index = placeholders.length;
+          placeholders.push(`<span style="color:${color}">${match}</span>`);
+          return `__HIGHLIGHT_${index}__`;
+        });
+      });
+      
+      // Restore placeholders
+      placeholders.forEach((placeholder, index) => {
+        result = result.replace(`__HIGHLIGHT_${index}__`, placeholder);
+      });
+      
+      return result;
+    };
+    
+    // Python highlighting
+    if (language === 'python' || language === 'py') {
+      return highlight(escaped, [
+        // Strings (single and double quotes, including multi-line)
+        {regex: /(["'])(?:(?!\1)[^\\]|\\.)*\1|(&quot;|&#039;)(?:(?!\2)[^\\]|\\.)*\2/g, color: '#ce9178'},
+        // Comments
+        {regex: /#.*/g, color: '#6a9955'},
+        // Keywords
+        {regex: /\b(def|class|if|elif|else|for|while|try|except|finally|with|as|import|from|return|yield|raise|break|continue|pass|lambda|and|or|not|in|is|True|False|None|async|await|global|nonlocal)\b/g, color: '#569cd6'},
+        // Built-in functions
+        {regex: /\b(print|len|range|str|int|float|list|dict|set|tuple|bool|type|input|open|file|abs|all|any|bin|chr|dir|enumerate|eval|exec|filter|format|getattr|hasattr|hash|hex|id|isinstance|iter|map|max|min|next|oct|ord|pow|repr|reversed|round|setattr|slice|sorted|sum|super|vars|zip)\b(?=\s*\()/g, color: '#dcdcaa'},
+        // Decorators
+        {regex: /@\w+/g, color: '#dcdcaa'},
+        // Numbers
+        {regex: /\b(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?\b/g, color: '#b5cea8'},
+        // Self
+        {regex: /\bself\b/g, color: '#9cdcfe'},
+        // Function/method calls
+        {regex: /\b([a-zA-Z_]\w*)\s*(?=\()/g, color: '#dcdcaa'},
+      ]);
+    }
+    
+    // JavaScript/TypeScript highlighting
+    if (language === 'javascript' || language === 'js' || language === 'typescript' || language === 'ts' || language === 'jsx' || language === 'tsx') {
+      return highlight(escaped, [
+        // Strings
+        {regex: /(["'`])(?:(?!\1)[^\\]|\\.)*\1|(&quot;|&#039;)(?:(?!\2)[^\\]|\\.)*\2/g, color: '#ce9178'},
+        // Comments
+        {regex: /\/\/.*/g, color: '#6a9955'},
+        // Keywords
+        {regex: /\b(const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|try|catch|finally|throw|new|this|class|extends|super|import|export|from|default|async|await|yield|typeof|instanceof|in|of|void|null|undefined|true|false)\b/g, color: '#569cd6'},
+        // Types (TypeScript)
+        {regex: /\b(string|number|boolean|any|void|never|unknown|object|Array|Promise|Record|Partial|Required|Pick|Omit)\b/g, color: '#4ec9b0'},
+        // Numbers
+        {regex: /\b(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?\b/g, color: '#b5cea8'},
+        // Function calls
+        {regex: /\b([a-zA-Z_$]\w*)\s*(?=\()/g, color: '#dcdcaa'},
+        // Properties
+        {regex: /\.([a-zA-Z_$]\w*)/g, color: '#9cdcfe'},
+      ]);
+    }
+    
+    // Bash/Shell highlighting
+    if (language === 'bash' || language === 'sh' || language === 'shell' || language === 'zsh') {
+      return highlight(escaped, [
+        // Strings
+        {regex: /(["'])(?:(?!\1)[^\\]|\\.)*\1|(&quot;|&#039;)(?:(?!\2)[^\\]|\\.)*\2/g, color: '#ce9178'},
+        // Comments
+        {regex: /#.*/g, color: '#6a9955'},
+        // Keywords
+        {regex: /\b(if|then|else|elif|fi|for|while|do|done|case|esac|in|function|return|exit|break|continue|export|source|alias|unalias|local|declare|readonly|shift|trap)\b/g, color: '#569cd6'},
+        // Common commands
+        {regex: /\b(echo|cd|ls|pwd|mkdir|rm|cp|mv|cat|grep|sed|awk|find|chmod|chown|sudo|apt|yum|pip|npm|git|docker|curl|wget|tar|zip|unzip|ssh|scp|kill|ps|top|df|du|head|tail|sort|uniq|wc|xargs|tee)\b/g, color: '#dcdcaa'},
+        // Variables
+        {regex: /\$\{?\w+\}?/g, color: '#9cdcfe'},
+        // Flags
+        {regex: /\s(-{1,2}[\w-]+)/g, color: '#ce9178'},
+      ]);
+    }
+    
+    // JSON highlighting
+    if (language === 'json') {
+      return highlight(escaped, [
+        // Property names
+        {regex: /(&quot;|")([^"\\]|\\.)*(&quot;|")(?=\s*:)/g, color: '#9cdcfe'},
+        // String values
+        {regex: /:\s*(&quot;|")([^"\\]|\\.)*(&quot;|")/g, color: '#ce9178'},
+        // Numbers
+        {regex: /:\s*(-?\d+\.?\d*)/g, color: '#b5cea8'},
+        // Booleans and null
+        {regex: /\b(true|false|null)\b/g, color: '#569cd6'},
+      ]);
+    }
+    
+    // YAML highlighting
+    if (language === 'yaml' || language === 'yml') {
+      return highlight(escaped, [
+        // Comments
+        {regex: /#.*/g, color: '#6a9955'},
+        // Keys
+        {regex: /^[\s-]*([a-zA-Z_][\w-]*)\s*:/gm, color: '#9cdcfe'},
+        // Strings
+        {regex: /(["'])(?:(?!\1)[^\\]|\\.)*\1/g, color: '#ce9178'},
+        // Numbers
+        {regex: /:\s*(-?\d+\.?\d*)\s*$/gm, color: '#b5cea8'},
+        // Booleans
+        {regex: /\b(true|false|yes|no|on|off)\b/gi, color: '#569cd6'},
+      ]);
+    }
+    
+    // HTML highlighting
+    if (language === 'html' || language === 'xml') {
+      return highlight(escaped, [
+        // Comments
+        {regex: /&lt;!--[\s\S]*?--&gt;/g, color: '#6a9955'},
+        // Tags
+        {regex: /&lt;\/?[\w-]+/g, color: '#569cd6'},
+        {regex: /\/?&gt;/g, color: '#569cd6'},
+        // Attributes
+        {regex: /\s([\w-]+)(?==)/g, color: '#9cdcfe'},
+        // Attribute values
+        {regex: /=(&quot;|")([^"]*?)(&quot;|")/g, color: '#ce9178'},
+      ]);
+    }
+    
+    // CSS highlighting
+    if (language === 'css' || language === 'scss' || language === 'sass') {
+      return highlight(escaped, [
+        // Comments
+        {regex: /\/\*[\s\S]*?\*\//g, color: '#6a9955'},
+        // Selectors
+        {regex: /^[\s]*([.#]?[\w-]+)/gm, color: '#d7ba7d'},
+        // Properties
+        {regex: /([\w-]+)\s*:/g, color: '#9cdcfe'},
+        // Values with units
+        {regex: /:\s*([\d.]+)(px|em|rem|%|vh|vw|deg|s|ms)/g, color: '#b5cea8'},
+        // Colors
+        {regex: /#[a-fA-F0-9]{3,8}\b/g, color: '#ce9178'},
+        // Important
+        {regex: /!important/g, color: '#569cd6'},
+      ]);
+    }
+    
+    // SQL highlighting
+    if (language === 'sql') {
+      return highlight(escaped, [
+        // Comments
+        {regex: /--.*/g, color: '#6a9955'},
+        // Strings
+        {regex: /(')(?:(?!\1)[^\\]|\\.)*\1/g, color: '#ce9178'},
+        // Keywords
+        {regex: /\b(SELECT|FROM|WHERE|INSERT|INTO|UPDATE|DELETE|CREATE|DROP|ALTER|TABLE|INDEX|VIEW|JOIN|LEFT|RIGHT|INNER|OUTER|ON|AND|OR|NOT|IN|IS|NULL|AS|ORDER|BY|GROUP|HAVING|LIMIT|OFFSET|UNION|ALL|DISTINCT|COUNT|SUM|AVG|MAX|MIN|CASE|WHEN|THEN|ELSE|END|PRIMARY|KEY|FOREIGN|REFERENCES|CONSTRAINT|DEFAULT|VALUES|SET)\b/gi, color: '#569cd6'},
+        // Numbers
+        {regex: /\b(\d+\.?\d*)\b/g, color: '#b5cea8'},
+      ]);
+    }
+    
+    // C/C++ highlighting
+    if (language === 'c' || language === 'cpp' || language === 'c++') {
+      return highlight(escaped, [
+        // Strings
+        {regex: /(["'])(?:(?!\1)[^\\]|\\.)*\1/g, color: '#ce9178'},
+        // Comments
+        {regex: /\/\/.*/g, color: '#6a9955'},
+        // Preprocessor
+        {regex: /#\w+/g, color: '#c586c0'},
+        // Keywords
+        {regex: /\b(int|char|float|double|void|long|short|unsigned|signed|const|static|extern|auto|register|volatile|struct|union|enum|typedef|sizeof|return|if|else|for|while|do|switch|case|default|break|continue|goto|class|public|private|protected|virtual|override|new|delete|this|template|typename|namespace|using|try|catch|throw)\b/g, color: '#569cd6'},
+        // Types
+        {regex: /\b(size_t|int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|bool|string|vector|map|set|list|array|shared_ptr|unique_ptr)\b/g, color: '#4ec9b0'},
+        // Numbers
+        {regex: /\b(\d+\.?\d*[fFlL]?|\d+[xX][0-9a-fA-F]+)\b/g, color: '#b5cea8'},
+        // Function calls
+        {regex: /\b([a-zA-Z_]\w*)\s*(?=\()/g, color: '#dcdcaa'},
+      ]);
+    }
+    
+    // Rust highlighting  
+    if (language === 'rust' || language === 'rs') {
+      return highlight(escaped, [
+        // Strings
+        {regex: /(["'])(?:(?!\1)[^\\]|\\.)*\1/g, color: '#ce9178'},
+        // Comments
+        {regex: /\/\/.*/g, color: '#6a9955'},
+        // Keywords
+        {regex: /\b(fn|let|mut|const|static|struct|enum|impl|trait|type|pub|mod|use|crate|self|super|where|for|loop|while|if|else|match|return|break|continue|move|ref|async|await|unsafe|extern|dyn)\b/g, color: '#569cd6'},
+        // Types
+        {regex: /\b(i8|i16|i32|i64|i128|isize|u8|u16|u32|u64|u128|usize|f32|f64|bool|char|str|String|Vec|Option|Result|Box|Rc|Arc|Cell|RefCell|HashMap|HashSet|BTreeMap|BTreeSet)\b/g, color: '#4ec9b0'},
+        // Macros
+        {regex: /\b\w+!/g, color: '#dcdcaa'},
+        // Numbers
+        {regex: /\b(\d+\.?\d*[fF]?|\d+[xX][0-9a-fA-F]+)\b/g, color: '#b5cea8'},
+        // Lifetimes
+        {regex: /'[a-zA-Z_]\w*/g, color: '#569cd6'},
+      ]);
+    }
+    
+    // Go highlighting
+    if (language === 'go' || language === 'golang') {
+      return highlight(escaped, [
+        // Strings
+        {regex: /(["'`])(?:(?!\1)[^\\]|\\.)*\1/g, color: '#ce9178'},
+        // Comments
+        {regex: /\/\/.*/g, color: '#6a9955'},
+        // Keywords
+        {regex: /\b(package|import|func|return|var|const|type|struct|interface|map|chan|go|select|case|default|if|else|for|range|switch|break|continue|fallthrough|goto|defer|panic|recover)\b/g, color: '#569cd6'},
+        // Types
+        {regex: /\b(int|int8|int16|int32|int64|uint|uint8|uint16|uint32|uint64|float32|float64|complex64|complex128|byte|rune|string|bool|error|any)\b/g, color: '#4ec9b0'},
+        // Built-in functions
+        {regex: /\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\b(?=\s*\()/g, color: '#dcdcaa'},
+        // Numbers
+        {regex: /\b(\d+\.?\d*|\d+[xX][0-9a-fA-F]+)\b/g, color: '#b5cea8'},
+      ]);
+    }
+    
+    // Default - no highlighting, just escaped
+    return escaped;
+  };
+
   // Simple markdown to HTML converter
   const convertMarkdownToHtml = (markdown: string): string => {
     // Remove frontmatter (---...---)
@@ -195,12 +431,16 @@ function PersonalizeControls(): React.ReactElement | null {
     const codeBlocks: string[] = [];
     content = content.replace(/```(\w+)?\n([\s\S]*?)```/g, (_, lang, code) => {
       const index = codeBlocks.length;
-      codeBlocks.push(`<pre><code class="language-${lang || ''}">${escapeHtml(code.trim())}</code></pre>`);
+      // Apply syntax highlighting based on language
+      const highlightedCode = highlightSyntax(code.trim(), lang || '');
+      codeBlocks.push(
+        `<pre style="background:#1e1e1e;color:#d4d4d4;padding:16px;border-radius:8px;overflow-x:auto;margin:1rem 0;font-family:Consolas,Monaco,'Courier New',monospace;font-size:14px;line-height:1.6;"><code>${highlightedCode}</code></pre>`
+      );
       return `__CODE_BLOCK_${index}__`;
     });
     
     // Convert inline code
-    content = content.replace(/`([^`]+)`/g, '<code>$1</code>');
+    content = content.replace(/`([^`]+)`/g, '<code style="background:#3c3c3c;color:#d4d4d4;padding:2px 6px;border-radius:4px;font-family:Consolas,Monaco,monospace;">$1</code>');
     
     // Convert headers
     content = content.replace(/^### (.*$)/gm, '<h3>$1</h3>');
@@ -228,7 +468,7 @@ function PersonalizeControls(): React.ReactElement | null {
     content = content.replace(/(<\/h[1-6]>)\s*<\/p>/g, '$1');
     content = content.replace(/<p>\s*(<ul>)/g, '$1');
     content = content.replace(/(<\/ul>)\s*<\/p>/g, '$1');
-    content = content.replace(/<p>\s*(<pre>)/g, '$1');
+    content = content.replace(/<p>\s*(<pre)/g, '$1');
     content = content.replace(/(<\/pre>)\s*<\/p>/g, '$1');
     
     // Restore code blocks
@@ -237,15 +477,6 @@ function PersonalizeControls(): React.ReactElement | null {
     });
     
     return content;
-  };
-
-  const escapeHtml = (text: string): string => {
-    return text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
   };
 
   // Don't render on server
