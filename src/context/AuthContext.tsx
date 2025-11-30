@@ -12,7 +12,7 @@ import React, {
 } from 'react';
 
 // API base URL - hardcoded for now, can be configured via docusaurus.config.ts customFields
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://physical-ai-textbook-api.fly.dev';
 
 // Types
 export interface User {

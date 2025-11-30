@@ -12,7 +12,7 @@ const config: Config = {
   // Custom fields for runtime configuration
   customFields: {
     // Backend API URL - use environment variable or default to localhost
-    apiUrl: process.env.API_URL || 'http://localhost:8000',
+    apiUrl: process.env.API_URL || 'https://physical-ai-textbook-api.fly.dev',
   },
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future

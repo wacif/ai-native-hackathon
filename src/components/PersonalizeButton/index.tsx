@@ -20,7 +20,7 @@ export default function PersonalizeButton({
   const [error, setError] = useState<string | null>(null);
   const [isPersonalized, setIsPersonalized] = useState(false);
 
-  const API_URL = (siteConfig.customFields?.apiUrl as string) || 'http://localhost:8000';
+  const API_URL = (siteConfig.customFields?.apiUrl as string) || 'https://physical-ai-textbook-api.fly.dev';
 
   // Check if user has any personalization preferences
   const hasPreferences = user && (
