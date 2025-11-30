@@ -1,0 +1,320 @@
+/**
+ * Authentication Component Styles
+ * Modern, clean design matching the textbook aesthetic
+ */
+
+.authContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  padding: 2rem;
+}
+
+.authCard {
+  background: var(--ifm-background-surface-color, #ffffff);
+  border-radius: 16px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--ifm-color-emphasis-200, #e5e7eb);
+}
+
+[data-theme='dark'] .authCard {
+  background: var(--ifm-background-surface-color, #1e1e1e);
+  border-color: var(--ifm-color-emphasis-300, #374151);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: var(--ifm-heading-color);
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--ifm-color-emphasis-600, #6b7280);
+  margin: 0 0 2rem 0;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-700, #374151);
+}
+
+[data-theme='dark'] .inputGroup label {
+  color: var(--ifm-color-emphasis-500, #9ca3af);
+}
+
+.inputGroup input,
+.inputGroup select,
+.inputGroup textarea {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--ifm-color-emphasis-300, #d1d5db);
+  border-radius: 8px;
+  background: var(--ifm-background-color, #ffffff);
+  color: var(--ifm-font-color-base);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.inputGroup input:focus,
+.inputGroup select:focus,
+.inputGroup textarea:focus {
+  outline: none;
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 3px var(--ifm-color-primary-lighter);
+}
+
+[data-theme='dark'] .inputGroup input,
+[data-theme='dark'] .inputGroup select,
+[data-theme='dark'] .inputGroup textarea {
+  background: var(--ifm-background-surface-color, #2d2d2d);
+  border-color: var(--ifm-color-emphasis-400, #4b5563);
+}
+
+.inputGroup input::placeholder {
+  color: var(--ifm-color-emphasis-400, #9ca3af);
+}
+
+.helpText {
+  font-size: 0.75rem;
+  color: var(--ifm-color-emphasis-500, #6b7280);
+  margin-top: 0.25rem;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, var(--ifm-color-primary) 0%, var(--ifm-color-primary-dark) 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+  margin-top: 0.5rem;
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(var(--ifm-color-primary-rgb, 37, 99, 235), 0.3);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondaryButton {
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-700, #374151);
+  background: var(--ifm-color-emphasis-100, #f3f4f6);
+  border: 1px solid var(--ifm-color-emphasis-300, #d1d5db);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.secondaryButton:hover {
+  background: var(--ifm-color-emphasis-200, #e5e7eb);
+  border-color: var(--ifm-color-emphasis-400, #9ca3af);
+}
+
+[data-theme='dark'] .secondaryButton {
+  background: var(--ifm-color-emphasis-200, #374151);
+  color: var(--ifm-color-emphasis-700, #d1d5db);
+  border-color: var(--ifm-color-emphasis-400, #4b5563);
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.buttonGroup .secondaryButton {
+  flex: 1;
+}
+
+.buttonGroup .submitButton {
+  flex: 2;
+  margin-top: 0;
+}
+
+.errorMessage {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  border: 1px solid #fecaca;
+}
+
+[data-theme='dark'] .errorMessage {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+.footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--ifm-color-emphasis-600, #6b7280);
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: var(--ifm-color-primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.linkButton:hover {
+  color: var(--ifm-color-primary-dark);
+}
+
+/* User Menu Button Styles */
+.userButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--ifm-color-emphasis-300, #d1d5db);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  color: var(--ifm-font-color-base);
+  font-size: 0.875rem;
+}
+
+.userButton:hover {
+  background: var(--ifm-color-emphasis-100, #f3f4f6);
+  border-color: var(--ifm-color-emphasis-400, #9ca3af);
+}
+
+[data-theme='dark'] .userButton:hover {
+  background: var(--ifm-color-emphasis-200, #374151);
+}
+
+.userAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--ifm-color-primary) 0%, var(--ifm-color-primary-dark) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.userDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: var(--ifm-background-surface-color, #ffffff);
+  border: 1px solid var(--ifm-color-emphasis-200, #e5e7eb);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .userDropdown {
+  background: var(--ifm-background-surface-color, #2d2d2d);
+  border-color: var(--ifm-color-emphasis-300, #374151);
+}
+
+.dropdownHeader {
+  padding: 1rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200, #e5e7eb);
+}
+
+[data-theme='dark'] .dropdownHeader {
+  border-color: var(--ifm-color-emphasis-300, #374151);
+}
+
+.dropdownHeader strong {
+  display: block;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.dropdownHeader span {
+  font-size: 0.75rem;
+  color: var(--ifm-color-emphasis-500, #6b7280);
+}
+
+.dropdownItem {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--ifm-font-color-base);
+  transition: background 0.2s;
+}
+
+.dropdownItem:hover {
+  background: var(--ifm-color-emphasis-100, #f3f4f6);
+}
+
+[data-theme='dark'] .dropdownItem:hover {
+  background: var(--ifm-color-emphasis-200, #374151);
+}
+
+.dropdownItem.danger {
+  color: #dc2626;
+}
+
+.dropdownItem.danger:hover {
+  background: #fef2f2;
+}
+
+[data-theme='dark'] .dropdownItem.danger:hover {
+  background: rgba(220, 38, 38, 0.1);
+}
+
