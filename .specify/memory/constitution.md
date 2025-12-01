@@ -1,14 +1,13 @@
 <!--
 Sync Impact Report:
-Version change: 1.2.3 -> 1.3.0 (MINOR: Updated Technical Stack to reflect actual implementation)
+Version change: 1.3.0 -> 1.4.0 (MINOR: Added Implementation Status, Updated Technical Stack with deployment info)
 List of modified principles:
-- Technical Stack & Tools: Updated to reflect FastAPI Native JWT Auth (replaced Better-Auth)
-- Technical Stack & Tools: Added specific versions and technologies (Gemini, FastEmbed)
-Added sections: None
+- Technical Stack & Tools: Added deployment platforms (Fly.io, GitHub Pages)
+- Technical Stack & Tools: Added qdrant-client API version note
+- Development Workflow: PHR changed from MUST to SHOULD for hackathon pace
+Added sections: Implementation Status (documents current build state)
 Removed sections: None
-Templates requiring updates:
-- specs/001-physical-ai-robotics-textbook/plan.md ✅ updated
-- specs/001-physical-ai-robotics-textbook/tasks.md ✅ updated
+Templates requiring updates: None (informational update only)
 Follow-up TODOs: None
 -->
 # Physical AI & Humanoid Robotics Textbook Constitution
@@ -189,9 +188,36 @@ Think like a relay race runner: Receive the baton cleanly, add your leg, hand of
 
 The project utilizes Docusaurus 3.9.2 for book generation and deployment to GitHub Pages. The RAG chatbot is built with OpenAI Agents SDK (with Google Gemini as LLM), FastAPI, Neon Serverless Postgres, Qdrant Cloud, and FastEmbed (BAAI/bge-small-en-v1.5 for embeddings). **FastAPI Native JWT Auth** (OAuth2 + bcrypt) is used for Signup/Signin - chosen over Better-Auth for simpler single-backend Python deployment. Development is driven by Claude Code and Spec-Kit Plus.
 
+**Deployment**:
+- **Frontend**: GitHub Pages (https://wacif.github.io/ai-native-hackathon/)
+- **Backend**: Fly.io (https://physical-ai-textbook-api.fly.dev) - 1 shared-cpu-1x VM, auto-stop enabled
+- **Database**: Neon Serverless Postgres
+- **Vector Store**: Qdrant Cloud (qdrant-client 1.16+ uses `query_points()` API)
+
+## Implementation Status
+
+**As of 2025-12-01**, the following is ALREADY IMPLEMENTED:
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Docusaurus Book | ✅ Complete | Deployed to GitHub Pages |
+| Textbook Content | ✅ Complete | 7 modules (intro, hardware, ROS2, simulation, Isaac, VLA, weekly-schedule) |
+| RAG Chatbot | ✅ Complete | OpenAI Agents SDK + Gemini + Qdrant |
+| User Auth (JWT) | ✅ Complete | Signup/Signin with FastAPI Native JWT |
+| User Profile | ✅ Complete | Software/hardware background stored |
+| Backend Deployment | ✅ Complete | Fly.io with auto-stop for cost savings |
+| Qdrant Ingestion | ✅ Complete | 26 chunks from 7 markdown files |
+| Content Personalization | ⚠️ Partial | Backend ready, frontend button exists |
+| Urdu Translation | ⚠️ Partial | Backend ready, frontend integration pending |
+
+**What Remains**:
+- Polish personalization UX flow
+- Complete Urdu translation frontend integration
+- End-to-end testing of all user stories
+
 ## Development Workflow & Quality Gates
 
-Development will follow Spec-Driven Development (SDD) principles, utilizing Spec-Kit Plus artifacts (spec.md, plan.md, tasks.md). Prompt History Records (PHRs) will be created for every user interaction. Architectural Decision Records (ADRs) will be suggested for significant decisions. Code reviews, automated testing, and CI/CD will ensure quality.
+Development will follow Spec-Driven Development (SDD) principles, utilizing Spec-Kit Plus artifacts (spec.md, plan.md, tasks.md). Prompt History Records (PHRs) SHOULD be created for significant interactions (relaxed from MUST for hackathon pace). Architectural Decision Records (ADRs) will be suggested for significant decisions. Code reviews, automated testing, and CI/CD will ensure quality.
 
 ### Virtual Environment Activation
 
@@ -204,4 +230,4 @@ All critical environment variables MUST be managed via .env files and explicitly
 ## Governance
 This constitution serves as the foundational agreement for all development within the "Physical AI & Humanoid Robotics Textbook" project. All code contributions, architectural decisions, and feature implementations MUST adhere to these principles. Amendments to this constitution require a formal proposal, team review, and a version bump in accordance with semantic versioning rules. Compliance will be verified during code reviews and project milestones.
 
-**Version**: 1.3.0 | **Ratified**: 2025-11-28 | **Last Amended**: 2025-11-30
+**Version**: 1.4.0 | **Ratified**: 2025-11-28 | **Last Amended**: 2025-12-01
