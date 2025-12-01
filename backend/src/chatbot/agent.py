@@ -86,13 +86,15 @@ def search_book_content(query: str, chapter_id: str = None, limit: int = 5) -> s
                 ]
             )
 
-        # Search in Qdrant with optional filter
-        search_results = qdrant_client.search(
+        # Search in Qdrant with optional filter (using query_points for qdrant-client >= 1.16)
+        search_response = qdrant_client.query_points(
             collection_name=QDRANT_COLLECTION_NAME,
-            query_vector=query_embedding.tolist(),
+            query=query_embedding.tolist(),
             query_filter=query_filter,
             limit=limit
         )
+        
+        search_results = search_response.points if search_response else []
 
         if not search_results:
             if chapter_id:
@@ -106,7 +108,7 @@ def search_book_content(query: str, chapter_id: str = None, limit: int = 5) -> s
             source = result.payload.get("source", "unknown")
             chapter = result.payload.get("chapter_id", "unknown")
             page_url = result.payload.get("page_url", "")
-            score = result.score
+            score = result.score if hasattr(result, 'score') else 0.0
 
             formatted_results.append(
                 f"[Result {i}] (Relevance: {score:.2f})\n"
@@ -128,22 +130,32 @@ def build_personalized_instructions(user_profile: Optional[UserProfile] = None) 
 
 Your capabilities:
 1. You have access to a search_book_content tool that retrieves relevant information from the book
-2. Always use the search tool to find relevant information before answering technical questions
-3. If a chapter_id is provided in the context (e.g., [Current Chapter: chapter1]), you know which chapter the user is currently viewing
-4. When asked "what chapter am I on?" or similar questions, respond based on the [Current Chapter: X] information in the prompt
-5. Base your answers on the retrieved content from the search tool
-6. If the retrieved content doesn't contain enough information, say so clearly
+2. You CAN and SHOULD summarize chapters, modules, or topics when asked
+3. You CAN explain concepts, provide overviews, and give detailed explanations
+4. Always use the search tool to find relevant information before answering
+5. If a chapter_id is provided in the context, you know which chapter the user is currently viewing
+6. Base your answers on the retrieved content from the search tool
 7. Cite sources when possible (mention the chapter and source file)
 8. Be concise but comprehensive
 9. If asked about selected text, focus specifically on that text
 
+What you CAN do:
+- Summarize chapters, modules, or entire sections
+- Explain complex concepts in simple terms
+- Answer questions about ROS 2, Gazebo, NVIDIA Isaac, VLA models
+- Provide code examples and explanations
+- Give overviews of topics
+- Compare and contrast different technologies
+- Help users understand the course structure
+
 Guidelines:
-- For questions about current location/chapter: Answer directly from the [Current Chapter: X] context without using the search tool
-- For technical questions: Use the search_book_content tool, and when chapter_id is available, pass it to filter results
-- When user is viewing a specific chapter, prioritize content from that chapter in search results
+- For summarization requests: Use the search tool to get content, then summarize it in your own words
+- For questions about current location/chapter: Answer directly from the [Current Chapter: X] context
+- For technical questions: Use the search_book_content tool with the chapter_id filter when available
+- When user is viewing a specific chapter, prioritize content from that chapter
 - Provide accurate, helpful responses based on the retrieved context
-- If you're not sure, admit it rather than making up information
-- Format your responses clearly and professionally
+- If retrieved content is insufficient, say so but still try to help with what you have
+- Format your responses clearly with headers, bullet points, or code blocks as appropriate
 - Be friendly and encouraging to learners
 """
     
@@ -258,6 +270,13 @@ Please answer based on the provided context."""
             # Map chapter_id to human-readable names
             chapter_names = {
                 "intro": "Introduction to Physical AI & Humanoid Robotics",
+                "module1-ros2": "Module 1: The Robotic Nervous System (ROS 2)",
+                "module2-simulation": "Module 2: The Digital Twin (Gazebo & Unity)",
+                "module3-isaac": "Module 3: The AI-Robot Brain (NVIDIA Isaac)",
+                "module4-vla": "Module 4: Voice-to-Action (VLA)",
+                "weekly-schedule": "Weekly Schedule & Labs",
+                "hardware-setup": "Hardware Setup Guide",
+                # Legacy mappings
                 "chapter1": "Chapter 1: Robot Sensors and Perception",
                 "chapter2": "Chapter 2: Actuators and Movement Control",
                 "chapter3": "Chapter 3: AI Algorithms for Robotics"
