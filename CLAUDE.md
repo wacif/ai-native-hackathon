@@ -212,6 +212,8 @@ See `.specify/memory/constitution.md` for code quality, testing, performance, se
 ## Active Technologies
 - JavaScript (for Docusaurus frontend), Python (for FastAPI backend). + Docusaurus, OpenAI Agents/ChatKit SDKs, FastAPI, Neon Serverless Postgres, Qdrant Cloud, Better-Auth (optional). (001-physical-ai-robotics-textbook)
 - Neon Serverless Postgres (for RAG chatbot and user data if auth implemented), Qdrant Cloud (for vector embeddings for RAG). (001-physical-ai-robotics-textbook)
+- TypeScript 5.x, React 18.x + Docusaurus 3.9.2, React, existing AuthContext (007-user-dashboard)
+- N/A (uses existing user data from AuthContext) (007-user-dashboard)
 
 ## Recent Changes
 - 001-physical-ai-robotics-textbook: Added JavaScript (for Docusaurus frontend), Python (for FastAPI backend). + Docusaurus, OpenAI Agents/ChatKit SDKs, FastAPI, Neon Serverless Postgres, Qdrant Cloud, Better-Auth (optional).
