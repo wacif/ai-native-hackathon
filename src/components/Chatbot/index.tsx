@@ -88,6 +88,19 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
     };
   }, []);
 
+  // Listen for openChatbot custom event (e.g., from dashboard "Ask AI Tutor" button)
+  useEffect(() => {
+    const handleOpenChatbot = () => {
+      setIsOpen(true);
+    };
+
+    window.addEventListener('openChatbot', handleOpenChatbot);
+
+    return () => {
+      window.removeEventListener('openChatbot', handleOpenChatbot);
+    };
+  }, []);
+
   const sendMessage = async (messageText: string) => {
     if (!messageText.trim()) return;
     
@@ -190,6 +203,7 @@ export default function Chatbot({ pageUrl, chapterId }: ChatbotProps) {
         className={`${styles.floatingButton} ${isOpen ? styles.open : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle chatbot"
+        data-chatbot-toggle
       >
         {isOpen ? '✕' : '💬'}
       </button>
